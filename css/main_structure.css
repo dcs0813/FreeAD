@@ -1,0 +1,75 @@
+/* CSS Document */
+
+/* Main Structure_start */
+#wrapper{
+	width:1024px;
+	margin: 0 auto; /* 將版面置中的必要設定！！ */
+}
+#header{
+	width:1024px;
+	overflow:hidden;
+	margin:0px 0px 5px 0px;
+	padding:0px;
+	border-bottom:#999 1px solid;
+}
+#container{
+	clear:both;
+	width:1024px;
+	overflow:hidden;
+	margin:0px;
+	padding:0px;
+}
+#footer{
+	clear:both; /* 清除block_content和block_module設定的float屬性產生的文繞圖現象！！ */
+	width:1024px;
+	overflow:hidden;
+	text-align:center;
+	font-size:12px;
+	font-family:Verdana, Geneva, sans-serif;
+	margin:5px 0px 0px 0px;
+	padding:12px 0px 32px 0px;
+	border-top:#999 1px solid;
+}
+/* Main Structure_end */
+
+/* Header_Element_start */
+#logo{
+	float:left;
+	display:inline-block;
+	font-size:24px;
+	color:#333;
+	font-family:Verdana, Geneva, sans-serif;
+	text-shadow:1px 1px 2px #999;
+	margin:18px 8px 3px 12px;
+	padding:0px;
+}
+#nav_buttons{
+	float:right;
+	display:inline-block;
+	font-size:12px;
+	color:#333;
+	font-family:Verdana, Geneva, sans-serif;
+	margin:28px 21px 3px 8px;
+	padding:0px;
+}
+#nav_buttons a:link, #nav_buttons a:visited{
+	font-size:12px;
+	color:#333;
+	font-family:Verdana, Geneva, sans-serif;
+	text-decoration:none;
+}
+#nav_buttons a:hover{
+	font-size:12px;
+	color: #903;
+	font-family:Verdana, Geneva, sans-serif;
+	text-decoration:none;
+}
+/* Header_Element_end */
+
+/* Container_Element_start */
+
+/* Container_Element_end */
+
+/* Footer_Element_start */
+
+/* Footer_Element_end */
