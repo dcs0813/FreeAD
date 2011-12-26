@@ -14,58 +14,438 @@ body {
 	background-color:#E6E6E6;
 	margin:0px;
 }
-table.table_free_ad{
-	width:100%;
-	border-collapse:collapse;
-}
-td.td_border{
-	padding:1px 1px 0px 0px;
-}
-.ad_1cx1r{
-	width:203px;
-	height:150px;
-	overflow:hidden;
-	background-color:#FFF;
-	margin:0px;
-	padding:0px;
-	-webkit-border-radius:5px;
-	-moz-border-radius:5px;
-	-o-border-radius:5px;
-	-ms-border-radius:5px;
-	box-shadow:1px 1px 2px #999;
-	border:#CCC 1px solid;
-}
-.ad_2cx1r{
-	width:408px;
-	height:150px;
-	overflow:hidden;
-	background-color:#FFF;
-	margin:0px;
-	padding:0px;
-	-webkit-border-radius:5px;
-	-moz-border-radius:5px;
-	-o-border-radius:5px;
-	-ms-border-radius:5px;
-	box-shadow:1px 1px 2px #999;
-	border:#CCC 1px solid;
-}
-.ad_2cx2r{
-	width:408px;
-	height:303px;
-	overflow:hidden;
-	background-color:#FFF;
-	margin:0px;
-	padding:0px;
-	-webkit-border-radius:5px;
-	-moz-border-radius:5px;
-	-o-border-radius:5px;
-	-ms-border-radius:5px;
-	box-shadow:1px 1px 2px #999;
-	border:#CCC 1px solid;
-}
 -->
 </style>
+<link href="css/colorbox.css" rel="stylesheet" />
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 <link href="css/main_structure.css" rel="stylesheet" type="text/css" />
+<script src="scripts/jquery-1.4.4.js" type="text/javascript"></script>
+<script src="scripts/colorbox/jquery.colorbox.js"></script>
+<script type="text/javascript">
+
+	/* 	
+		1: admin/root
+		2: VIP
+	*/
+	var memberLevel = 2;
+	var userName = "Ted";
+	var userId = "0";
+	var rows = new Array(7);
+	rows[0] = new Array(4);
+	rows[1] = new Array(2);
+	rows[2] = new Array(3);
+	rows[3] = new Array(3);
+	rows[4] = new Array(3);
+	rows[5] = new Array(3);
+	rows[6] = new Array(2);
+	rows[7] = new Array(4);
+	
+	var grid = new Array(7);
+	grid[0] = new Array("2cx2r", "1cx1r", "1cx1r", "1cx1r");
+	grid[1] = new Array("1cx1r", "2cx1r");
+	grid[2] = new Array("2cx1r", "2cx1r", "1cx1r");
+	grid[3] = new Array("2cx1r", "2cx2r", "1cx1r");
+	grid[4] = new Array("1cx1r", "1cx1r", "1cx1r");
+	grid[5] = new Array("2cx2r", "2cx1r", "1cx1r");
+	grid[6] = new Array("2cx1r", "1cx1r");
+	grid[7] = new Array("1cx1r", "1cx1r", "1cx1r", "2cx1r");
+
+	$(document).ready(function() {
+		initGUI();
+	});
+	
+	function initGUI() {
+		$.post("htmfiles/list_ad.php",
+			function(data) {
+				// init value
+				for (r = 0; r<rows.length; r++) {
+					for (c = 0; c<rows[r].length; c++) {
+						rows[r][c] = "";
+						var position = "r" + r.toString() + "c" + c.toString();
+						$('#ad_'+position).remove();
+					}
+				}
+				
+				for (i = 0; i< data.length; i++) {
+					var user = data[i][0];
+
+					var editable = memberLevel == 1 || memberLevel == 2 && user == userName; // admin, VIP user delete itself
+					var deletable = editable || memberLevel != 1 && memberLevel != 2 && user == ""; // editable, general user can delete trial
+					
+					var position = data[i][1];
+					var args = position.split("c")
+					var r = args[0].split("r")[1];
+					var c = args[1];
+					
+					var title = data[i][2];
+					var content = data[i][3];
+					var picture = data[i][4];
+					var link = data[i][5];
+					var phone = data[i][6];
+					var expire = data[i][7]; // 2012-01-01 15:20:21
+
+					rows[r][c] = position + "%" + expire; // has advertising
+					
+					var td = document.getElementById(position);
+					switch (grid[r][c]) {
+					case "2cx2r":
+						var ad = document.createElement("div");
+						ad.setAttribute("id", "ad_" + position);
+						ad.className = "ad_2cx2r";
+						var top = document.createElement("div");
+						top.className = "ad_outter_frame_" + grid[r][c];
+						var adTitle = document.createElement("div");
+						adTitle.setAttribute("id", "title_" + position);
+						adTitle.className = "ad_title_2cx2r";
+						adTitle.innerHTML = title;
+						var addContent = document.createElement("div");
+						addContent.setAttribute("id", "content_" + position);
+						addContent.className = "ad_content_2cx2r";
+						addContent.innerHTML = content;
+						var addPicture = document.createElement("div");
+						addPicture.setAttribute("id", "picture_" + position);
+						addPicture.className = "ad_picture_2cx2r";
+						top.appendChild(adTitle);
+						top.appendChild(addContent);
+						top.appendChild(addPicture);
+						
+						var down = document.createElement("div");
+						down.setAttribute("id", "banner_" + position);
+						down.className = "ad_ui_" + grid[r][c];
+						var a = document.createElement("a");
+						a.setAttribute("href", "#");
+						a.setAttribute("style", "text-decoration:none; color:#000;");
+						var imgLink = document.createElement("img");
+						imgLink.setAttribute("border", "0");
+						imgLink.setAttribute("src", "pictures/icon_link.png");
+						imgLink.setAttribute("style", "margin-left:12px; padding-top:2px;");
+						a.appendChild(imgLink);
+						
+						down.appendChild(a);
+						var imgPhone = document.createElement("img");
+						imgPhone.setAttribute("title", phone);
+						imgPhone.setAttribute("alt", phone);
+						imgPhone.setAttribute("src", "pictures/icon_phone.png");
+						imgPhone.setAttribute("style", "padding-top:2px;");
+						down.appendChild(imgPhone);
+						
+						if (editable) {
+							var a = document.createElement("a");
+							a.setAttribute("href", "#");
+							a.setAttribute("style", "text-decoration:none; color:#000;");
+							var img = document.createElement("img");
+							img.setAttribute("id", "edit_"+position);
+							img.setAttribute("border", "0");
+							img.setAttribute("src", "pictures/icon_edit.png");
+							img.setAttribute("style", "padding-top:2px;");
+							a.appendChild(img);
+							down.appendChild(a);
+						}
+						if (deletable) {
+							var a = document.createElement("a");
+							a.setAttribute("href", "#");
+							a.setAttribute("style", "text-decoration:none; color:#000;");
+							var img = document.createElement("img");
+							img.setAttribute("id", "delete_"+position);
+							img.onclick = function() { deleteOnClick(this); };
+							img.setAttribute("border", "0");
+							img.setAttribute("src", "pictures/icon_delete.png");
+							img.setAttribute("style", "padding-top:2px;");
+							a.appendChild(img);
+							down.appendChild(a);
+						}						
+						var time = document.createElement("div");
+						time.className = "count_down_area";
+						var imgTime = document.createElement("img");
+						imgTime.setAttribute("src", "pictures/icon_clock.png");
+						imgTime.setAttribute("style", "padding-bottom:3px;");
+						imgTime.setAttribute("align", "absmiddle");
+						
+						time.appendChild(imgTime);
+						var span = document.createElement("span"); // "12/29/2011 2:00 PM +0800"
+						span.setAttribute("id", "countdown_"+position);
+						span.innerHTML = "23H : 59M : 59S ";
+						time.appendChild(span); 
+						down.appendChild(time);						
+						ad.appendChild(top);
+						ad.appendChild(down);						
+						td.appendChild(ad);
+						CountBack("countdown_"+position, grid[r][c], getSecs(expire));
+						break;
+					case "2cx1r":		
+						var ad = document.createElement("div");
+						ad.setAttribute("id", "ad_" + position);
+						ad.className = "ad_2cx1r";
+						var top = document.createElement("div");
+						top.className = "ad_outter_frame_" + grid[r][c];
+						var adTitle = document.createElement("div");
+						adTitle.setAttribute("id", "title_" + position);
+						adTitle.className = "ad_title_2cx1r";
+						adTitle.innerHTML = title;
+						var addContent = document.createElement("div");
+						addContent.setAttribute("id", "content_" + position);
+						addContent.className = "ad_content_2cx1r";
+						addContent.innerHTML = content;
+						var addPicture = document.createElement("div");
+						addPicture.setAttribute("id", "picture_" + position);
+						addPicture.className = "ad_picture_2cx1r";
+						top.appendChild(adTitle);
+						top.appendChild(addContent);
+
+						var down = document.createElement("div");
+						down.setAttribute("id", "banner_" + position);
+						down.className = "ad_ui_" + grid[r][c];
+						var a = document.createElement("a");
+						a.setAttribute("href", "#");
+						a.setAttribute("style", "text-decoration:none; color:#000;");
+						var imgLink = document.createElement("img");
+						imgLink.setAttribute("border", "0");
+						imgLink.setAttribute("src", "pictures/icon_link.png");
+						imgLink.setAttribute("style", "margin-left:12px; padding-top:2px;");
+						a.appendChild(imgLink);
+						
+						down.appendChild(a);
+						var imgPhone = document.createElement("img");
+						imgPhone.setAttribute("title", phone);
+						imgPhone.setAttribute("alt", phone);
+						imgPhone.setAttribute("src", "pictures/icon_phone.png");
+						imgPhone.setAttribute("style", "padding-top:2px;");
+						down.appendChild(imgPhone);
+						if (editable) {
+							var a = document.createElement("a");
+							a.setAttribute("href", "#");
+							a.setAttribute("style", "text-decoration:none; color:#000;");
+							var img = document.createElement("img");
+							img.setAttribute("id", "edit_"+position);
+							img.setAttribute("border", "0");
+							img.setAttribute("src", "pictures/icon_edit.png");
+							img.setAttribute("style", "padding-top:2px;");
+							a.appendChild(img);
+							down.appendChild(a);
+						}
+						if (deletable) {
+							var a = document.createElement("a");							
+							a.setAttribute("href", "#");
+							a.setAttribute("style", "text-decoration:none; color:#000;");
+							var img = document.createElement("img");
+							img.setAttribute("id", "delete_"+position);
+							img.onclick = function() { deleteOnClick(this); };
+							img.setAttribute("border", "0");
+							img.setAttribute("src", "pictures/icon_delete.png");
+							img.setAttribute("style", "padding-top:2px;");
+							a.appendChild(img);
+							down.appendChild(a);
+						}
+						var time = document.createElement("div");
+						time.className = "count_down_area";
+						var imgTime = document.createElement("img");
+						imgTime.setAttribute("src", "pictures/icon_clock.png");
+						imgTime.setAttribute("style", "padding-bottom:3px;");
+						imgTime.setAttribute("align", "absmiddle");
+						
+						time.appendChild(imgTime);
+						var span = document.createElement("span"); // "12/29/2011 2:00 PM +0800"
+						span.setAttribute("id", "countdown_"+position);
+						span.innerHTML = "23H : 59M : 59S ";
+						time.appendChild(span); 
+						down.appendChild(time);						
+						ad.appendChild(top);
+						ad.appendChild(addPicture);
+						ad.appendChild(down);
+						td.appendChild(ad);
+						CountBack("countdown_"+position, grid[r][c], getSecs(expire));
+						
+						break;
+					case "1cx1r":
+						var ad = document.createElement("div");
+						ad.setAttribute("id", "ad_" + position);
+						ad.className = "ad_1cx1r";
+						var top = document.createElement("div");
+						var adTitle = document.createElement("div");
+						adTitle.setAttribute("id", "title_" + position);
+						adTitle.className = "ad_title_1cx1r";
+						adTitle.innerHTML = title;
+						var addContent = document.createElement("div");
+						addContent.setAttribute("id", "content_" + position);
+						addContent.className = "ad_content_1cx1r";
+						addContent.innerHTML = content;
+						var addPicture = document.createElement("div");
+						addPicture.setAttribute("id", "picture_" + position);
+						addPicture.className = "ad_picture_1cx1r";
+						top.appendChild(adTitle);
+						top.appendChild(addContent);
+						top.appendChild(addPicture);
+
+						var down = document.createElement("div");
+						down.setAttribute("id", "banner_" + position);
+						down.className = "ad_ui_" + grid[r][c];
+						var a = document.createElement("a");
+						a.setAttribute("href", "#");
+						a.setAttribute("style", "text-decoration:none; color:#000;");
+						var imgLink = document.createElement("img");
+						imgLink.setAttribute("border", "0");
+						imgLink.setAttribute("src", "pictures/icon_link.png");
+						imgLink.setAttribute("style", "margin-left:3px; padding-top:2px;");
+						a.appendChild(imgLink);
+						
+						down.appendChild(a);
+						var imgPhone = document.createElement("img");
+						imgPhone.setAttribute("title", phone);
+						imgPhone.setAttribute("alt", phone);
+						imgPhone.setAttribute("src", "pictures/icon_phone.png");
+						imgPhone.setAttribute("style", "padding-top:2px;");
+						down.appendChild(imgPhone);
+						if (editable) {
+							var a = document.createElement("a");
+							a.setAttribute("href", "#");
+							a.setAttribute("style", "text-decoration:none; color:#000;");
+							var img = document.createElement("img");
+							img.setAttribute("id", "edit_"+position);
+							img.setAttribute("border", "0");
+							img.setAttribute("src", "pictures/icon_edit.png");
+							img.setAttribute("style", "padding-top:2px;");
+							a.appendChild(img);
+							down.appendChild(a);
+						}
+						if (deletable) {
+							var a = document.createElement("a");							
+							a.setAttribute("href", "#");
+							a.setAttribute("style", "text-decoration:none; color:#000;");
+							var img = document.createElement("img");
+							img.setAttribute("id", "delete_"+position);
+							img.onclick = function() { deleteOnClick(this); };
+							img.setAttribute("border", "0");
+							img.setAttribute("src", "pictures/icon_delete.png");
+							img.setAttribute("style", "padding-top:2px;");
+							a.appendChild(img);
+							down.appendChild(a);
+						}
+						var time = document.createElement("div");
+						time.className = "count_down_area_for_1cx1r";
+						var span = document.createElement("span"); // "12/29/2011 2:00 PM +0800"
+						span.setAttribute("id", "countdown_"+position);
+						span.innerHTML = "23:59:59";
+						time.appendChild(span); 
+						down.appendChild(time);						
+						ad.appendChild(top);
+						ad.appendChild(down);
+						td.appendChild(ad);
+						CountBack("countdown_"+position, grid[r][c], getSecs(expire));
+						break;
+					}
+					
+				}
+				// alternative innerHTML to DOM method
+				for (r = 0; r<rows.length; r++) {
+					for (c = 0; c<rows[r].length; c++) {
+						if (rows[r][c]=="") {
+							var position = "r" + r.toString() + "c" + c.toString();
+							var td = document.getElementById(position);
+							var ad = document.createElement("div");
+							ad.setAttribute("id", "ad_"+position);
+							switch (grid[r][c]) {
+							case "2cx2r":
+								ad.className = "ad_2cx2r";
+								break;
+							case "2cx1r":
+								ad.className = "ad_2cx1r";
+								break;
+							case "1cx1r":
+								ad.className = "ad_1cx1r";
+								break
+							}
+							var add = document.createElement("div");
+							add.className = "add_new_ad";
+							add.onclick = function() { addOnClick(this); };
+							add.setAttribute("id", "add_"+position);
+							var a = document.createElement("a");
+							a.setAttribute("href", "#");
+							a.setAttribute("style", "text-decoration:none; color:#000;");
+							var img = document.createElement("img");
+							img.setAttribute("border", "0");
+							img.setAttribute("src", "pictures/icon_add.png");
+							img.setAttribute("style", "margin-right:3px; padding-bottom:5px;");
+							img.setAttribute("align", "absmiddle");
+							a.appendChild(img);
+							a.appendChild(document.createTextNode("新增廣告內容 "));
+							add.appendChild(a);							
+							ad.appendChild(add);
+							td.appendChild(ad);
+						}
+					}
+				}
+				
+			}, "json");
+		
+		//setTimeout("initGUI();", 3000);
+	}
+	
+	function addOnClick(item) {
+		//alert("add " + $(item).attr("id"));
+		//init GUI of ad creation
+		var position = $(item).attr("id").split("_")[0];
+		$.colorbox({opacity:0.9, transition:"fade", title:true, 
+			href:"./htmfiles/add_new_ad.html?mode=add&position="+position+"&m_id="+userId});
+	}
+
+	function editOnClick(item) {
+		//alert("edit" + $(item).attr("id"));
+		//init GUI of ad creation
+		var position = $(item).attr("id").split("_")[0];
+		$.colorbox({opacity:0.9, transition:"fade", title:true, 
+			href:"./htmfiles/add_new_ad.html?mode=exit&position="+position+"&m_id="+userId});
+	}
+	
+	function deleteOnClick(item) {
+		//alert("del " + $(item).attr("id"));
+		var position = $(item).attr("id").split("_")[0];
+		//init GUI of ad creation
+		
+		
+	}
+	
+	function Calcage(secs, num1, num2)
+	{
+		s = ((Math.floor(secs/num1))%num2).toString();
+		if (s.length < 2) 
+		{	
+			s = "0" + s;
+		}
+		return (s);
+	}
+	
+	function getSecs (myTargetDate) {
+		var dthen	= new Date(myTargetDate);
+		var dnow	= new Date();
+		ddiff		= new Date(dthen-dnow);
+		secs		= Math.floor(ddiff.valueOf()/1000);	
+		return secs;
+	}
+	
+	function CountBack(myDiv, grid, secs)
+	{	
+	    var DisplayStr;
+	    var DisplayFormat = "%%D%%D %%H%%H:%%M%%M:%%S%%S";
+	    if (grid == "1cx1r") 
+	    	DisplayFormat = "%%D%%D,%%H%%:%%M%%:%%S%%";
+	    DisplayStr = DisplayFormat.replace(/%%D%%/g,	Calcage(secs,86400,100000));
+	    DisplayStr = DisplayStr.replace(/%%H%%/g,		Calcage(secs,3600,24));
+	    DisplayStr = DisplayStr.replace(/%%M%%/g,		Calcage(secs,60,60));
+	    DisplayStr = DisplayStr.replace(/%%S%%/g,		Calcage(secs,1,60));
+	    if(secs > 0)
+	    {	
+	    	document.getElementById(myDiv).innerHTML = DisplayStr;
+	      	setTimeout("CountBack('" + myDiv + "','" + grid + "'," + (secs-1) + ");", 990);
+	    }
+	    else
+	    {
+	    	document.getElementById(myDiv).innerHTML = "Expired";
+	    	return (-1);
+	    }
+	    return (0);
+	}
+	
+</script> 
 </head>
 
 <body>
@@ -84,46 +464,117 @@ td.td_border{
 <!--Container_開始-->
 <div id="container">
 <table class="table_free_ad">
-	<tr>
-    	<td class="td_border" rowspan="2" colspan="2" valign="top"><div class="ad_2cx2r"></div></td>
-        <td class="td_border" valign="top"><div class="ad_1cx1r"></div></td>
-        <td class="td_border" valign="top"><div class="ad_1cx1r"></div></td>
-        <td class="td_border" valign="top"><div class="ad_1cx1r"></div></td>
-        
+	<tr> <!-- r0 -->
+    	<td id="r0c0" class="td_border" rowspan="2" colspan="2" valign="top"> <!-- c0 -->
+        	<div id="ad_r0c0" class="ad_2cx2r">
+            </div>
+        </td>
+        <td id="r0c1" class="td_border" valign="top"> <!-- c1 -->
+			<div id="ad_r0c1" class="ad_1cx1r">
+            </div>
+        </td>
+        <td id="r0c2" class="td_border" valign="top"> <!-- c2 -->
+   	        <div id="ad_r0c2" class="ad_1cx1r">
+	        </div>
+        </td>
+        <td id="r0c3" class="td_border" valign="top"> <!-- c3 -->
+	        <div id="ad_r0c3" class="ad_1cx1r">
+	        </div>
+        </td>
     </tr>
-    <tr>
-    	<td class="td_border" valign="top"><div class="ad_1cx1r"></div></td>
-        <td class="td_border" colspan="2" valign="top"><div class="ad_2cx1r"></div></td>
+    <tr> <!-- r1 -->
+    	<td id="r1c0" class="td_border" valign="top"> <!-- c0 -->
+    		<div id="ad_r1c0" class="ad_1cx1r">
+    		</div>
+   		</td>
+        <td id="r1c1" class="td_border" colspan="2" valign="top"> <!-- c1 -->
+        	<div id="ad_r1c1" class="ad_2cx1r">
+            </div>
+        </td>
     </tr>
-    <tr>
-    	<td class="td_border" colspan="2" valign="top"><div class="ad_2cx1r"></div></td>
-        <td class="td_border" colspan="2" valign="top"><div class="ad_2cx1r"></div></td>
-        <td class="td_border" valign="top"><div class="ad_1cx1r"></div></td>
+    <tr> <!-- r2 -->
+    	<td id="r2c0" class="td_border" colspan="2" valign="top"> <!-- c0 -->
+	    	<div id="ad_r2c0" class="ad_2cx1r">
+	    	</div>
+    	</td>
+        <td id="r2c1" id="r2c1" class="td_border" colspan="2" valign="top"> <!-- c1 -->
+	        <div id="ad_r2c1" class="ad_2cx1r">
+	        </div>
+        </td>
+        <td id="r2c2" id="r2c2" class="td_border" valign="top"> <!-- c2 -->
+	        <div id="ad_r2c2" class="ad_1cx1r">
+	        </div>
+        </td>
     </tr>
-    <tr>
-    	<td class="td_border" colspan="2" valign="top"><div class="ad_2cx1r"></div></td>
-        <td class="td_border" rowspan="2" colspan="2" valign="top"><div class="ad_2cx2r"></div></td>
-        <td class="td_border" valign="top"><div class="ad_1cx1r"></div></td>
+    <tr> <!-- r3 -->
+    	<td id="r3c0" class="td_border" colspan="2" valign="top"> <!-- c0 -->
+	    	<div id="ad_r3c0" class="ad_2cx1r">
+	    	</div>
+    	</td>
+        <td id="r3c1" id="r3c1" class="td_border" rowspan="2" colspan="2" valign="top"> <!-- c1 -->
+	        <div id="ad_r3c1" class="ad_2cx2r">
+	        </div>
+        </td>
+        <td id="r3c2" id="r3c2" class="td_border" valign="top"> <!-- c2 -->
+	        <div id="ad_r3c2" class="ad_1cx1r">
+	        </div>
+        </td>
     </tr>
-    <tr>
-    	<td class="td_border" valign="top"><div class="ad_1cx1r"></div></td>
-        <td class="td_border" valign="top"><div class="ad_1cx1r"></div></td>
-        <td class="td_border" valign="top"><div class="ad_1cx1r"></div></td>
+    <tr> <!-- r4 -->
+    	<td id="r4c0" id="r4c0" class="td_border" valign="top"> <!-- c0 -->
+	    	<div id="ad_r4c0" class="ad_1cx1r">
+	    	</div>
+    	</td>
+        <td id="r4c1" id="r4c1" class="td_border" valign="top"> <!-- c1 -->
+	        <div id="ad_r4c1" class="ad_1cx1r">
+	        </div>
+        </td>
+        <td id="r4c2" id="r4c2" class="td_border" valign="top"> <!-- c2 -->
+	        <div id="ad_r4c2"class="ad_1cx1r">
+	        </div>
+        </td>
     </tr>
-    <tr>
-    	<td class="td_border"rowspan="2" colspan="2" valign="top"><div class="ad_2cx2r"></div></td>
-        <td class="td_border" colspan="2" valign="top"><div class="ad_2cx1r"></div></td>
-        <td class="td_border" valign="top"><div class="ad_1cx1r"></div></td>
+    <tr> <!-- r5 -->
+    	<td id="r5c0" id="r5c0" class="td_border"rowspan="2" colspan="2" valign="top"> <!-- c0 -->
+	    	<div id="ad_r5c0" class="ad_2cx2r">
+	    	</div>
+    	</td>
+        <td id="r5c1" id="r5c1" class="td_border" colspan="2" valign="top"> <!-- c1 -->
+	        <div id="ad_r5c1" class="ad_2cx1r">
+	        </div>
+        </td>
+        <td id="r5c2" id="r5c2" class="td_border" valign="top"> <!-- c2 -->
+	        <div id="ad_r5c2" class="ad_1cx1r">
+	        </div>
+        </td>
     </tr>
-    <tr>
-    	<td class="td_border" colspan="2" valign="top"><div class="ad_2cx1r"></div></td>
-        <td class="td_border" valign="top"><div class="ad_1cx1r"></div></td>
+    <tr> <!-- r6 -->
+    	<td id="r6c0" id="r6c0" class="td_border" colspan="2" valign="top"> <!-- c0 -->
+	    	<div id="ad_r6c0" class="ad_2cx1r">
+	    	</div>
+    	</td>
+        <td id="r6c1" class="td_border" valign="top"> <!-- c1 -->
+	        <div id="ad_r6c1" class="ad_1cx1r">
+	        </div>
+        </td>
     </tr>
-    <tr>
-    	<td class="td_border" valign="top"><div class="ad_1cx1r"></div></td>
-        <td class="td_border" valign="top"><div class="ad_1cx1r"></div></td>
-        <td class="td_border" valign="top"><div class="ad_1cx1r"></div></td>
-        <td class="td_border" colspan="2" valign="top"><div class="ad_2cx1r"></div></td>
+    <tr> <!-- r7 -->
+    	<td id="r7c0" class="td_border" valign="top"> <!-- c0 -->
+	    	<div id="ad_r7c0" class="ad_1cx1r">
+	    	</div>
+    	</td>
+        <td id="r7c1" class="td_border" valign="top"> <!-- c1 -->
+	        <div id="ad_r7c1" class="ad_1cx1r">
+	        </div>
+        </td>
+        <td id="r7c2" class="td_border" valign="top"> <!-- c2 -->
+	        <div id="ad_r7c2" class="ad_1cx1r">
+	        </div>
+        </td>
+        <td id="r7c3" class="td_border" colspan="2" valign="top"> <!-- c3 -->
+	        <div id="ad_r7c3" class="ad_2cx1r">
+	        </div>
+        </td>
     </tr>
 </table>
 </div>

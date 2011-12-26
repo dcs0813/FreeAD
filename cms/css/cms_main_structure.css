@@ -1,0 +1,201 @@
+/* CSS Document */
+
+/* Main Structure_start */
+#wrapper{
+	width:844px;
+	/*background-image:url(../pictures/backpic_main_back_white_shadow_02.png);
+	background-repeat:repeat-y;*/
+	margin: 0 auto; /* 將版面置中的必要設定！！ */
+}
+#header{
+	position:relative;
+	z-index:23;
+	width:821px;
+	height:170px;
+	background-image:url(../pictures/backpic_header.png);
+	background-repeat:no-repeat;
+	margin-left:7px;
+}
+#container{
+	position:relative;
+	clear:both;
+	width:821px;
+	margin:0px auto;
+}
+#footer{
+	position:relative;
+	z-index:23;
+	clear:both; /* 清除block_content和block_module設定的float屬性產生的文繞圖現象！！ */
+	width:839px;
+	height:224px;
+	background-image: url(../pictures/backpic_footer_02.png);
+	background-repeat:no-repeat;
+	margin:0 auto;
+}
+/* Main Structure_end */
+
+/* Header_Element_start */
+#logo_for_cms{
+	float:left;
+	display:inline-block;
+	font-size:26px;
+	color:#333;
+	font-family:Verdana, Geneva, sans-serif;
+	text-shadow:1px 1px 2px #999;
+	margin:42px 8px 3px 23px;
+	padding:0px;
+}
+#log_info{
+	float:right;
+	display:inline-block;
+	margin:46px 3px 0px 0px;
+	padding:0px;
+}
+#btn_logout{
+	float:right;
+	display:inline-block;
+	width:66px;
+	height:18px;
+	background-image:url(../pictures/backpic_btn_logout.png);
+	background-repeat:no-repeat;
+	font-size:12px;
+	color:#000;
+	text-align:center;
+	margin:38px 8px 0px 6px;
+	padding:7px 0px 0px 0px;
+}
+#btn_logout a:link, #btn_logout a:visited{
+	font-size:12px;
+	color:#000;
+	text-decoration:none;
+}
+#btn_logout a:hover{
+	font-size:12px;
+	color:#821E23;
+	text-decoration:none;
+}
+/* Header_Element_end */
+
+/* Container_Element_start */
+.login_area{
+	width:384px;
+	height:165px;
+	overflow:hidden;
+	background-color:#FFF;
+	margin:0px;
+	padding:0px;
+	-webkit-border-radius:5px;
+	-moz-border-radius:5px;
+	-o-border-radius:5px;
+	-ms-border-radius:5px;
+	box-shadow:1px 1px 2px #999;
+	border:#CCC 1px solid;
+}
+tr.tr_main_edit_area{
+	background-color:#F7F7F7;
+}
+td.td_left_nav{
+	width:190px;
+	padding:15px 0px 23px 0px;
+}
+td.td_right_main_func{
+	width:760px;
+	padding:12px 0px 23px 6px;
+}
+.left_nav a:link, .left_nav a:visited{
+	font-size:13px;
+	color:#0F2E4D;
+	text-decoration:none;
+}
+.left_nav a:hover{
+	font-size:13px;
+	color:#821E23;
+	text-decoration:none;
+}
+.left_nav{
+	width:181px;
+	height:19px;
+	background-image:url(../pictures/backpic_left_nav.png);
+	background-repeat:repeat-x;
+	font-size:13px;
+	color:#0F2E4D;
+	margin:0px 6px 0px 0px;
+	padding:7px 0px 0px 12px;
+	border:#999 1px solid;
+}
+.left_nav_sub_func_outter_frame{
+	width:193px;
+	overflow:hidden;
+	margin:0px;
+	padding:0px;
+	border-top:#0F2E4D 1px solid;
+	border-bottom:#999 1px solid;
+	border-left:#999 1px solid;
+	border-right:#999 1px solid;
+}
+.left_nav_sub_func{
+	width:100%;
+	overflow:hidden;
+	font-size:13px;
+	color:#000;
+	margin:0px;
+	padding:6px 0px 6px 26px;
+	border-bottom:#999 1px dotted;
+}
+.left_nav_sub_func a:link, .left_nav_sub_func a:visited{
+	font-size:13px;
+	color:#000;
+	text-decoration:none;
+}
+.left_nav_sub_func a:hover{
+	font-size:13px;
+	color:#821E23;
+	text-decoration:none;
+}
+#right_main_func_title{
+	width:704px;
+	height:27px;
+	background-image:url(../pictures/backpic_cms_edit_page_main_func_title.png);
+	background-repeat:no-repeat;
+	font-size:18px;
+	color:#821E23;
+	margin:0px 0px 0px 0px;
+	padding:13px 0px 0px 46px;
+}
+#right_main_func_options{
+	width:741px;
+	min-height:36px;
+	overflow:hidden;
+	box-shadow: 1px 1px 6px #999;
+	background-color:#FFF;
+	margin:0px;
+	padding:0px;
+}
+table.table_main_func_area{
+	width:85%;
+	margin:18px;
+	border-collapse:collapse;
+}
+td.td_main_func_area_title{
+	width:25%;
+	font-size:13px;
+	color:#000;
+	padding:6px;
+}
+td.td_main_func_area_content{
+	font-size:13px;
+	color:#666;
+	padding:6px;
+}
+/* Container_Element_end */
+
+/* Footer_Element_start */
+td.td_footer{
+	width:100%;
+	height:47px;
+	background-image:url(../pictures/backpic_cms_edit_page_footer.png);
+	background-repeat:repeat-x;
+	font-size:12px;
+	text-align:center;
+}
+/* Footer_Element_end */

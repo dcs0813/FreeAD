@@ -1,0 +1,415 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="keywords" content=" ">
+<meta name="description" content=" " />
+<meta name="robots" content="all">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>freeAD :: 後台管理系統</title>
+<script src="../../scripts/jquery-1.4.4.js" type="text/javascript"></script>
+<!-- <script src="../../scripts/jquery.json-2.3.js" type="text/javascript"></script> -->
+<script type="text/javascript" src="../../scripts/datepicker/js/datepicker.js"></script>
+<script type="text/javascript" src="../../scripts/datepicker/js/eye.js"></script> 
+<script type="text/javascript" src="../../scripts/datepicker/js/utils.js"></script> 
+<script type="text/javascript" src="../../scripts/datepicker/js/layout.js?ver=1.0.2"></script>
+<style type="text/css">
+<!--
+body {
+	width:100%;
+	/*background-image:url(../pictures/backpic_001.png);
+	background-repeat:repeat-x;*/
+	background-color:#E6E6E6;
+	margin:0px;
+}
+table{
+	border-collapse:collapse;
+}
+-->
+</style>		 
+<link href="../../scripts/datepicker/css/datepicker.css" rel="stylesheet" type="text/css" />
+<link href="../../css/main_structure.css" rel="stylesheet" type="text/css" />
+<link href="../css/cms_main_structure.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript">
+	
+	pic1 = new Image(16, 16); 
+	pic1.src = "../pictures/loader.gif";	
+	
+	function initDateTime() {
+		var date = getDate("date");
+		var time = getDate("time");
+		$("#editInit").val(date);
+		$("#editInitTime").val(time);
+		$("#editExpire").val(date);
+		$("#editExpireTime").val(time);
+	}
+
+	function initAddGUI() {
+		if (mode == 'edit') {
+			mode = 'add';
+			window.location="cms_edit.html?mode=add";
+			return;
+		}
+		$('#editName').empty();
+		$('#editPhone').empty();
+		$('#editPayment').empty();
+		$('#editUserName').empty();
+		$('#editUserPass').empty();
+		$("#editUserPass").show();
+		$("#passTitle").show();
+		$("#selectTitle").hide();
+		$("#selectName").hide();
+		initDateTime();
+	}
+
+	function initEditGUI() {
+		if (mode == 'add') {
+			mode = 'edit';
+			window.location="cms_edit.html?mode=edit";
+			return;
+		}
+	    $.ajax({
+	        type: "POST",
+	        url: "registry.php",
+	        data: "mode=getAll",
+	        dataType: "json",
+	        success: function(data) {
+	        	$("#selectTitle").show();
+	        	$("#selectName").show();
+	        	$("#selectName").empty();
+	        	for (var i = 0; i<data.length;i++) {
+	        		if (i == 0) {
+	        			initEditUser(data[i].toString());
+	        		}
+	        		$("#selectName").append($("<option></option>")
+	        		         .attr("value", i)
+	        		         .text(data[i]));
+	        	}
+	        }
+	    });
+	}
+	
+	function initEditUser(username) {
+	    $.ajax({
+	        type: "POST",
+	        url: "registry.php",
+	        data: "mode=get&username="+username,
+	        dataType: "json",
+	        success: function(data) {
+	        	$("#editName").val(data.name.toString());
+	        	$("#editPhone").val(data.phone.toString());
+	        	var initArgs = data.initTime.toString().split(" ");
+	        	$("#editInit").val(initArgs[0].toString());
+	        	$("#editInitTime").val(initArgs[1].toString());
+	        	$("#editPayment").val(data.payment.toString());
+	        	$("#editUserName").val(data.username.toString());
+	        	$("#editUserPass").hide();
+	        	$("#passTitle").hide();
+	        	var expireArgs = data.expireTime.toString().split(" ");
+	        	$("#editExpire").val(expireArgs[0].toString());
+	        	$("#editExpireTime").val(expireArgs[1].toString());
+	        }
+	    });
+	}
+	
+	var mode = ''; 
+	$(document).ready(function() {
+		initDateTime();
+		mode = getValue("mode");
+		if (mode == "add") {
+			initAddGUI();
+		}
+		else if (mode == "edit") {
+			initEditGUI();
+		}
+		
+		$(function(){
+		    $("#form1").submit(function(e){
+		       e.preventDefault();
+
+		        dataString = $("#form1").serialize();
+
+		        $.ajax({
+		        type: "POST",
+		        url: "registry.php",
+		        data: "mode=add"
+                	+ "&username=" + $('#editUserName').val().toString()
+					+ "&userpass=" + $('#editUserPass').val().toString() 
+					+ "&name="+ $('#editName').val().toString() 
+					+ "&phone="+ $('#editPhone').val()
+					+ "&payment="+ $('#editPayment').val() 
+					+ "&initTime="+ ($('#editInit').val().toString() + " " + $('#editInitTime').val().toString() + " " + "+0800")
+					+ "&expireTime="+ ($('#editExpire').val().toString() + " " + $('#editExpireTime').val().toString() + " " + "+0800"),
+		        dataType: "json",
+		        success: function(data) {
+					//alert(data.registry_check);					
+					if (data.registry == "success") {
+						initAddGUI();
+						alert("註冊成功!");
+					}
+					else{
+						alert("註冊失敗!");
+					}
+
+		        }
+
+		        });
+
+		    });
+		});
+
+		$("#selectName").change(function() {
+			var foo = [];
+			$("#selectName :selected").each(function(i, selected){
+				foo[i] = $(selected).text();
+				initEditUser(foo[i].toString());
+			});			
+			
+		});
+		
+	$('#clean').click(function() {
+	    $('#editUserName').html("");
+	    // document.getElementById('msg').innerHTML = "";
+	 });
+	
+	$("#editUserName").change(function() { 
+		
+		var usr = $("#editUserName").val();
+
+		if(usr.length >= 4)
+		{
+			$("#msg").html('<img src="../pictures/loader.gif" align="absmiddle">&nbsp;Checking availability...');
+			
+			    $.ajax({  
+			    type: "POST",  
+			    url: "registry_check.php",  
+			    data: "username="+ usr,  
+			    success: function(msg){  
+			   
+				   $("#msg").ajaxComplete(function(event, request, settings){ 
+				
+					if(msg == 'OK')
+					{ 
+				        $("#editUserName").removeClass('object_error'); // if necessary
+						$("#editUserName").addClass("object_ok");
+						$(this).html('&nbsp;<img src="../pictures/tick.gif" align="absmiddle">');
+					}  
+					else  
+					{  
+						$("#editUserName").removeClass('object_ok'); // if necessary
+						$("#editUserName").addClass("object_error");
+						$(this).html(msg);
+					}  
+				   
+				   });
+			
+			   } 
+			   
+			}); 
+		
+		}
+		else {
+				$("#msg").html('<font color="red">使用者名稱至少要 <strong>4</strong> 字元.</font>');
+				$("#editUserName").removeClass('object_ok'); // if necessary
+				$("#editUserName").addClass("object_error");
+			}
+		
+		});
+	
+		//"06/27/2012 12:33 PM +0800"
+	 	$("#editExpire").DatePicker({
+			format:'m/d/Y',
+			date: $('#editExpire').val(),
+			current: $('#editExpire').val(),
+			starts: 1,          
+			onBeforeShow: function(){
+				var text_value = trim($('#editExpire').val());
+				$('#editExpire').DatePickerSetDate(text_value, true);
+				},
+				onChange: function(formated, dates){
+					$('#editExpire').val(formated);
+				}
+	
+		});
+	
+	 	$("#editInit").DatePicker({
+			format:'m/d/Y',
+			date: $('#editInit').val(),
+			current: $('#editInit').val(),
+			starts: 1,          
+			onBeforeShow: function(){
+				var text_value = trim($('#editInit').val());
+				$('#editInit').DatePickerSetDate(text_value, true);
+				},
+				onChange: function(formated, dates){
+					$('#editInit').val(formated);
+				}
+	
+		});
+	 	
+	});  
+
+	function getDate(type) {
+		var bar = "";
+		var now = new Date();
+		if (type == "date")
+			bar = (now.getMonth()+1) + "/" + now.getDate() + "/" + (1900 + now.getYear());
+		else if (type == "time") {
+			var str = now.getHours()>12?" PM":" AM";
+			bar = (now.getHours()>12?(now.getHours()-12):now.getHours()) + ":" + now.getMinutes() + str;
+		}			
+		return bar;
+	}
+
+	//cms_edit.html?mode=add
+	function getValue(varname) {
+		var url = window.location.href;
+		var qparts = url.split("?");
+		if (qparts.length == 0) {
+			return "";
+		}
+		var query = qparts[1];
+		var vars = query.split("&");
+		var value = "";
+		for (i = 0; i < vars.length; i++) {
+			var parts = vars[i].split("=");
+			if (parts[0] == varname) {
+				value = parts[1];
+				break;
+			}
+		}
+		value = unescape(value);
+		value.replace(/\+/g, " ");
+		return value;
+	}
+
+	function trim(s) {
+		return rtrim(ltrim(s));
+	}
+
+	function ltrim(s) {
+		return s.replace(/^\s*/, "");
+	}
+
+	function rtrim(s) {
+		return s.replace(/\s*$/, "");
+	}
+
+	// 檢查 form 內的必要欄位是否已填寫
+	// 或所填的資訊是否有誤 
+	function check() { //"06/27/2012 12:33 PM +0800"
+		var form1 = document.form1;
+		if (form1.editUserName.value == "") {
+			alert("未輸入帳號");
+			return false;
+		} else if (form1.editUserPass.value == "") {
+			alert("請勿使用空白密碼");
+			return false;
+		} else if (form1.editExpire.value == "" || form1.editExpireTime.value == "") {
+			alert("請輸入權限截止日期/時間");
+			return false;
+		} else if (form1.editInit.value == "" || form1.editInitTime.value == "") {
+			alert("請輸入申請日期/時間");
+			return false;
+		}
+		return true;		
+	}
+	
+	function confirmLogout() {
+		answer = confirm("確定要登出?")
+		if (answer !=0)
+		{
+			location = "../../index.html"
+		}
+	}
+</script>
+</head>
+
+<body>
+<form name="form1" id="form1" action="" method="POST">
+<table width="960px" align="center">
+<tr>
+	<td colspan="2">
+        <table width="100%" align="center" cellpadding="0" cellspacing="0">
+            <tr style="background-image:url(../pictures/backpic_cms_edit_page_header.png); background-repeat:repeat-x;">
+                <td height="84px" valign="top">
+                    <div id="logo_for_cms">freeAD</div>
+                </td>
+                <td height="84px" valign="middle" style="font-size:12px; text-align:right">
+                    <div id="btn_logout"><a onclick="confirmLogout()" href="#">登出</a></div>
+                    <div id="log_info">Hi, 系統管理員 您好</div>
+                </td>
+            </tr>
+        </table>
+	</td>
+</tr>
+<tr class="tr_main_edit_area">
+	<td class="td_left_nav" valign="top">
+    	<div class="left_nav"><img src="../pictures/icon_left_nav.png" style="margin-right:3px; padding-bottom:5px;" align="absmiddle"/><a href="#">網站相關設定</a></div>
+        <div class="left_nav"><img src="../pictures/icon_left_nav.png" style="margin-right:3px; padding-bottom:5px;" align="absmiddle"/><a href="#">VIP 會員資料管理</a></div>
+        <div class="left_nav_sub_func_outter_frame">
+        	<div class="left_nav_sub_func" onclick="initAddGUI()"><a href="#">新增會員資料</a></div>
+            <div class="left_nav_sub_func" onclick="initEditGUI()"><a href="#">檢視會員資料</a></div>
+        </div>
+    </td>
+    <td class="td_right_main_func" valign="top" align="left">
+    	<div id="right_main_func_title">VIP 會員資料管理</div>
+        <div id="right_main_func_options">
+        	<table class="table_main_func_area" align="left">
+            	<tr>
+                	<td id="selectTitle" class="td_main_func_area_title" align="right">選擇</td>
+                    <td class="td_main_func_area_content">
+	                    <select name="selectName" id="selectName" style="width: 55px;"/>
+	                    </select>
+                    </td>
+                </tr>
+            	<tr>
+                	<td class="td_main_func_area_title" align="right">VIP 申請人姓名</td>
+                    <td class="td_main_func_area_content"><input name="editName" id="editName" type="text" size="55px"/></td>
+                </tr>
+                <tr>
+                	<td class="td_main_func_area_title" align="right">聯絡電話</td>
+                    <td class="td_main_func_area_content"><input name="editPhone" id="editPhone" type="text" size="55px"/></td>
+                </tr>
+                <tr>
+                	<td class="td_main_func_area_title" align="right">申請日期</td>
+                    <td class="td_main_func_area_content"><input class="inputValue_Txt calen_sel_box" name="editInit" id="editInit" type="text" size="55px"/></td>
+                </tr>
+                <tr>
+                    <td class="td_main_func_area_title" align="right">申請時間</td>
+                    <td class="td_main_func_area_content"><input class="inputValue_Txt calen_sel_box" name="editInitTime" id="editInitTime" type="text" size="55px"/></td>
+                </tr>
+                <tr>
+                	<td class="td_main_func_area_title" align="right">支付之刊登費用</td>
+                    <td class="td_main_func_area_content"><input name="editPayment" id="editPayment" type="text" size="55px"/></td>
+                </tr>
+                <tr>
+                	<td class="td_main_func_area_title" align="right">【設定】登入使用者名稱</td>
+                    <td class="td_main_func_area_content"><input name="editUserName" id="editUserName" type="text" size="55px"/><div id="msg"></div></td>
+                </tr>
+                <tr>
+                	<td id="passTitle" class="td_main_func_area_title" align="right">【設定】登入密碼</td>
+                    <td class="td_main_func_area_content"><input id="editUserPass" name="editUserPass" type="text" size="55px"/></td>
+                </tr>
+                <tr>
+                	<td class="td_main_func_area_title" align="right">【設定】權限截止日期</td>
+                  	<td class="td_main_func_area_content"><input id="editExpire" class="inputValue_Txt calen_sel_box" name="editExpire" type="text" size="55px"/></td>
+                </tr>
+                <tr>
+                  	<td class="td_main_func_area_title" align="right">【設定】權限截止時間</td>
+                  	<td class="td_main_func_area_content"><input id="editExpireTime" class="inputValue_Txt calen_sel_box" name="editExpireTime" type="text" size="55px"/></td>
+                </tr>
+                <tr><td colspan="2"><input type="submit" value="送出資料" style="margin:18px 0px 8px 170px;"/>&nbsp;&nbsp;<input type="reset" value="清除重填"/></td></tr>
+            </table>
+        </div>
+    </td>
+</tr>
+<tr>
+	<td class="td_footer" colspan="2">
+    	All rights reserved by freeAD !
+    </td>
+</tr>
+</table>
+</form>
+</body>
+</html>

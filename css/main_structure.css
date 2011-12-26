@@ -67,7 +67,218 @@
 /* Header_Element_end */
 
 /* Container_Element_start */
-
+table.table_free_ad{
+	width:100%;
+	border-collapse:collapse;
+}
+td.td_border{
+	padding:1px 1px 0px 0px;
+}
+.ad_1cx1r{
+	width:203px;
+	height:203px;
+	overflow:hidden;
+	background-color:#FFF;
+	margin:0px;
+	padding:0px;
+	-webkit-border-radius:5px;
+	-moz-border-radius:5px;
+	-o-border-radius:5px;
+	-ms-border-radius:5px;
+	box-shadow:1px 1px 2px #999;
+	border:#CCC 1px solid;
+}
+.ad_2cx1r{
+	width:408px;
+	height:203px;
+	overflow:hidden;
+	background-color:#FFF;
+	margin:0px;
+	padding:0px;
+	-webkit-border-radius:5px;
+	-moz-border-radius:5px;
+	-o-border-radius:5px;
+	-ms-border-radius:5px;
+	box-shadow:1px 1px 2px #999;
+	border:#CCC 1px solid;
+}
+.ad_2cx2r{
+	width:408px;
+	height:406px;
+	overflow:hidden;
+	background-color:#FFF;
+	margin:0px;
+	padding:0px;
+	-webkit-border-radius:5px;
+	-moz-border-radius:5px;
+	-o-border-radius:5px;
+	-ms-border-radius:5px;
+	box-shadow:1px 1px 2px #999;
+	border:#CCC 1px solid;
+}
+.add_new_ad{
+	width:90%;
+	font-size:14px;
+	color:#333;
+	text-align:center;
+	margin:88px 6px 6px 8px;
+	padding:0px;
+}
+.ad_title_1cx1r{
+	font-size:14px;
+	color:#333;
+	line-height:18px;
+	text-align:left;
+	margin:12px 6px 6px 8px;
+	padding:0px;
+}
+.ad_content_1cx1r{
+	font-size:12px;
+	color:#333;
+	line-height:18px;
+	text-align:left;
+	margin:3px 6px 6px 8px;
+	padding:0px;
+}
+.ad_picture_1cx1r{
+	width:185px;
+	height:72px;
+	margin:3px 6px 8px 8px;
+	padding:0px;
+	border:#333 1px solid;
+}
+.ad_ui_1cx1r{
+	width:100%;
+	height:26px;
+	background-color: rgba(77,77,77,0.25);
+	margin:0px;
+	padding:0px;
+}
+.ad_outter_frame_2cx1r{   /*兩格式廣告的左側文字內容外框*/
+	float:left;
+	display:inline-block;
+	width:185px;
+	height:155px;
+	overflow:hidden;
+	display:inline-block;
+	margin:12px 6px 6px 8px;
+	padding:0px;
+}
+.ad_title_2cx1r{
+	font-size:14px;
+	color:#333;
+	line-height:18px;
+	text-align:left;
+	margin:0px;
+	padding:0px;
+}
+.ad_content_2cx1r{
+	font-size:12px;
+	color:#333;
+	line-height:18px;
+	text-align:left;
+	margin:9px 0px 6px 0px;
+	padding:0px;
+}
+.ad_picture_2cx1r{
+	float:right;
+	display:inline-block;
+	width:185px;
+	height:155px;
+	margin:12px 10px 8px 8px;
+	padding:0px;
+	border:#333 1px solid;
+}
+.ad_ui_2cx1r{
+	clear:both;
+	width:100%;
+	height:26px;
+	background-color: rgba(77,77,77,0.25);
+	margin:0px;
+	padding:0px;
+}
+.ad_outter_frame_2cx2r{   /*四格式廣告的左側文字內容外框*/
+	width:394px;
+	height:362px;
+	overflow:hidden;
+	display:inline-block;
+	margin:12px 6px 6px 8px;
+	padding:0px;
+}
+.ad_title_2cx2r{
+	font-size:14px;
+	color:#333;
+	line-height:18px;
+	text-align:left;
+	margin:0px 0px 6px 0px;
+	padding:0px;
+}
+.ad_content_2cx2r{
+	font-size:12px;
+	color:#333;
+	line-height:18px;
+	text-align:left;
+	margin:3px 0px 6px 0px;
+	padding:0px;
+}
+.ad_picture_2cx2r{
+	width:388px;
+	height:194px;
+	margin:3px 0px 8px 0px;
+	padding:0px;
+	border:#333 1px solid;
+}
+.ad_ui_2cx2r{
+	width:100%;
+	height:26px;
+	background-color: rgba(77,77,77,0.25);
+	margin:0px;
+	padding:0px;
+}
+.count_down_area_for_1cx1r{
+	float:right;
+	display:inline-block;
+	font-size:14px;
+	font-family:Arial, Helvetica, sans-serif;
+	color:#333;
+	font-weight:bold;
+	margin:0px 12px 0px 0px;
+	padding:5px 0px 0px 0px;
+}
+.count_down_area{
+	float:right;
+	display:inline-block;
+	font-size:14px;
+	font-family:Arial, Helvetica, sans-serif;
+	color:#333;
+	font-weight:bold;
+	margin:0px 12px 0px 0px;
+	padding:3px 0px 0px 0px;
+}
+#func_title{
+	width:100%;
+	overflow:hidden;
+	font-size:18px;
+	color:#333;
+	font-family:Verdana, Geneva, sans-serif;
+	text-shadow:1px 1px 2px #999;
+	margin:8px 8px 12px 12px;
+	padding:0 0 3px 12px;
+	border-bottom:#666 1px dotted;
+}
+#add_new_ad_area{
+	width:500px;
+	overflow:hidden;
+	background-color:#FFF;
+	margin:0 auto;
+	padding:12px 12px 21px 12px;
+	-webkit-border-radius:6px;
+	-moz-border-radius:6px;
+	-o-border-radius:6px;
+	-ms-border-radius:6px;
+	box-shadow:1px 1px 2px #999;
+	border:#CCC 1px solid;
+}
 /* Container_Element_end */
 
 /* Footer_Element_start */
