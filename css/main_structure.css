@@ -124,7 +124,23 @@ td.td_border{
 	margin:88px 6px 6px 8px;
 	padding:0px;
 }
+.add_new_ad a:link, .add_new_ad a:visited{
+	font-size:14px;
+	color:#333;
+	font-family:Verdana, Geneva, sans-serif;
+	text-decoration:none;
+}
+.add_new_ad a:hover{
+	font-size:14px;
+	color: #903;
+	font-family:Verdana, Geneva, sans-serif;
+	text-decoration:none;
+}
+
 .ad_title_1cx1r{
+	width:100%;
+	height:35px;
+	overflow:hidden;
 	font-size:14px;
 	color:#333;
 	line-height:18px;
@@ -133,24 +149,37 @@ td.td_border{
 	padding:0px;
 }
 .ad_content_1cx1r{
+	width:100%;
+	min-height:51px;
+	max-height:110px;
+	overflow:hidden;
 	font-size:12px;
 	color:#333;
 	line-height:18px;
 	text-align:left;
-	margin:3px 6px 6px 8px;
+	margin:6px 6px 3px 8px;
 	padding:0px;
 }
 .ad_picture_1cx1r{
-	width:185px;
-	height:72px;
+	/* width:185px;
+	height:72px; */
 	margin:3px 6px 8px 8px;
 	padding:0px;
 	border:#333 1px solid;
+	max-width:185px; /* 最大寬度為500px*/
+	width:185px; /* 圖片的大小為500px*/
+	width:expression(width>185?\"185px\":width \"px\");max-width: 185px; /* 假如圖片的尺寸超過550象素,那么就按550象素顯示,高度同比例變化;假如圖片的尺寸小于550象素,那么就原尺寸顯示。在IE6中有效*/
+	max-height:185px; /* 最大寬度為500px*/
+	height:72px; /* 圖片的大小為500px*/
+	height:expression(height>72?\"72px\":height \"px\");max-height: 72px; /* 假如圖片的尺寸超過550象素,那么就按550象素顯示,高度同比例變化;假如圖片的尺寸小于550象素,那么就原尺寸顯示。在IE6中有效*/
+	max-height:72px; /* 最大寬度為500px*/
+	overflow:hidden; /* 超出的部分隱藏，避免控制圖片大小失敗而引起的撐開變形*/ 
 }
 .ad_ui_1cx1r{
 	width:100%;
 	height:26px;
-	background-color: rgba(77,77,77,0.25);
+	background-image:url(../pictures/backpic_ad_ui.png);
+	background-repeat:repeat;
 	margin:0px;
 	padding:0px;
 }
@@ -183,17 +212,27 @@ td.td_border{
 .ad_picture_2cx1r{
 	float:right;
 	display:inline-block;
-	width:185px;
-	height:155px;
+	/* width:185px;
+	height:155px; */
 	margin:12px 10px 8px 8px;
 	padding:0px;
 	border:#333 1px solid;
+	max-width:185px; /* 最大寬度為500px*/
+	width:185px; /* 圖片的大小為500px*/
+	width:expression(width>185?\"185px\":width \"px\");max-width: 185px; /* 假如圖片的尺寸超過550象素,那么就按550象素顯示,高度同比例變化;假如圖片的尺寸小于550象素,那么就原尺寸顯示。在IE6中有效*/
+	max-height:185px; /* 最大寬度為500px*/
+	height:155px; /* 圖片的大小為500px*/
+	height:expression(height>155?\"155px\":height \"px\");max-height: 155px; /* 假如圖片的尺寸超過550象素,那么就按550象素顯示,高度同比例變化;假如圖片的尺寸小于550象素,那么就原尺寸顯示。在IE6中有效*/
+	max-height:155px; /* 最大寬度為500px*/
+	overflow:hidden; /* 超出的部分隱藏，避免控制圖片大小失敗而引起的撐開變形*/ 
+	
 }
 .ad_ui_2cx1r{
 	clear:both;
 	width:100%;
 	height:26px;
-	background-color: rgba(77,77,77,0.25);
+	background-image:url(../pictures/backpic_ad_ui.png);
+	background-repeat:repeat;
 	margin:0px;
 	padding:0px;
 }
@@ -222,16 +261,26 @@ td.td_border{
 	padding:0px;
 }
 .ad_picture_2cx2r{
-	width:388px;
-	height:194px;
+	/* width:388px;
+	height:194px; */
 	margin:3px 0px 8px 0px;
 	padding:0px;
 	border:#333 1px solid;
+	
+	max-width:388px; /* 最大寬度為500px*/
+	width:388px; /* 圖片的大小為500px*/
+	width:expression(width>388?\"388px\":width \"px\");max-width: 388px; /* 假如圖片的尺寸超過550象素,那么就按550象素顯示,高度同比例變化;假如圖片的尺寸小于550象素,那么就原尺寸顯示。在IE6中有效*/
+	max-height:388px; /* 最大寬度為500px*/
+	height:194px; /* 圖片的大小為500px*/
+	height:expression(height>194?\"194px\":height \"px\");max-height: 194px; /* 假如圖片的尺寸超過550象素,那么就按550象素顯示,高度同比例變化;假如圖片的尺寸小于550象素,那么就原尺寸顯示。在IE6中有效*/
+	max-height:194px; /* 最大寬度為500px*/
+	overflow:hidden; /* 超出的部分隱藏，避免控制圖片大小失敗而引起的撐開變形*/ 
 }
 .ad_ui_2cx2r{
 	width:100%;
 	height:26px;
-	background-color: rgba(77,77,77,0.25);
+	background-image:url(../pictures/backpic_ad_ui.png);
+	background-repeat:repeat;
 	margin:0px;
 	padding:0px;
 }
@@ -268,6 +317,19 @@ td.td_border{
 }
 #add_new_ad_area{
 	width:500px;
+	overflow:hidden;
+	background-color:#FFF;
+	margin:0 auto;
+	padding:12px 12px 21px 12px;
+	-webkit-border-radius:6px;
+	-moz-border-radius:6px;
+	-o-border-radius:6px;
+	-ms-border-radius:6px;
+	box-shadow:1px 1px 2px #999;
+	border:#CCC 1px solid;
+}
+#join_vip_area{
+	width:650px;
 	overflow:hidden;
 	background-color:#FFF;
 	margin:0 auto;
