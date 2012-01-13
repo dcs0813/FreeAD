@@ -31,7 +31,7 @@ if(isSet($_POST['username']))
 	mysql_select_db ($dbDatabase, $db) or die ("Could not select database.");	
 	$sql_check = mysql_query("select id from members where username='".$username."'") or die(mysql_error());*/
 	$SQLStr = "SELECT m_username FROM freead_member " . 
-    "WHERE m_username = '" . db_escape($username) . "'";
+    "WHERE m_username = '" . db_escape($username) . "' AND is_delete=0";
 	
     $res = db_query($SQLStr);// 若查詢結果中有資料
     if (db_num_rows($res) == 1) // 表示名稱已被註冊

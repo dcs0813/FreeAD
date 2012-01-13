@@ -1,0 +1,351 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+	<head>
+	<meta name="keywords" content=" ">
+	<meta name="description" content=" " />
+	<meta name="robots" content="all">
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		
+		<title>DataTables example</title>
+		<!-- <style type="text/css" title="currentStyle">
+			@import "../../media/css/demo_page.css";
+			@import "../../media/css/demo_table.css";
+		</style> -->
+		<link href="../../css/colorbox.css" rel="stylesheet" />		
+		<link href="../../css/main_structure.css" rel="stylesheet" type="text/css" />
+		<link href="../css/cms_main_structure.css" rel="stylesheet" type="text/css" />
+		<link href="../css/media/css/demo_page.css" rel="stylesheet" type="text/css" />
+		<link href="../css/media/css/demo_table.css" rel="stylesheet" type="text/css" />		
+		<script type="text/javascript" language="javascript" src="../css/media/js/jquery.js"></script>
+		<script type="text/javascript" language="javascript" src="../../scripts/jquery-1.4.4.js"></script>
+		<script src="../../scripts/colorbox/jquery.colorbox.js"></script>
+		<script type="text/javascript" language="javascript" src="../css/media/js/jquery.dataTables.js"></script>
+		<script type="text/javascript" charset="utf-8">
+
+		var userName = '';
+		function checkLogin() {
+			if (window.location.href.indexOf("?") != -1) {
+				var status = getValue("status");
+				userName = getValue("username");
+				if (status == "loginSuccess") {
+					alert("系統管理員, 歡迎回來!");
+					refresh(userName);
+				} else if (status == "loginFailed") {
+					alert("登入失敗, 請檢查您的帳號密碼!");
+					userName = "";
+					refresh(userName);
+				}
+			}
+			else {
+				alert("登入失敗, 請檢查您的帳號密碼!");
+				window.location="login.html?username="+userName;
+			}
+		}
+		
+		function getValue(varname) {
+			var url = window.location.href;
+			var qparts = url.split("?");
+			if (qparts.length == 0) {
+				return "";
+			}
+			var query = qparts[1];
+			var vars = query.split("&");
+			var value = "";
+			for (i = 0; i < vars.length; i++) {
+				var parts = vars[i].split("=");
+				if (parts[0] == varname) {
+					value = parts[1];
+					break;
+				}
+			}
+			value = unescape(value);
+			value.replace(/\+/g, " ");
+			return value;
+		}
+		
+			var oTable;        // 宣告為global變數
+
+			$(document).ready(function() {			
+				checkLogin();
+				oTable = $('#table_grid').dataTable();
+				 /* oTable = $('#table_grid').dataTable({      
+				        "bJQueryUI": true,                     
+				        "sPaginationType": "full_numbers",     
+				        "bProcessing": true,
+				        "iDisplayLength": 5
+				} ); */
+
+				initEditGUI();
+				
+			});
+			
+			function initEditGUI() {
+				
+			    $.ajax({
+			        url: 'registry.php',
+			        type: 'POST',
+			        data: "mode=getAll",
+			        dataType: 'json',
+			        success: function(data, status){
+			            buildTable(data);
+			        },
+			        error: function(xhrInstance, status, xhrException) {
+			            alert("failure:" + status);
+			        }
+			    });
+			    return true;
+			}
+			
+			function buildTable(tableData) {
+			    oTable.fnClearTable(0);    // 等同html("")
+			    $.each(tableData, function(i){
+			    	var maintainId = "cms_"+tableData[i][0];
+			        oTable.fnAddData([     // 動態新增record
+			            tableData[i][0],
+			            tableData[i][1],
+			            tableData[i][2],
+			            /* "<a id=cms_"+tableData[i][0]+" class=\"edit\" href=\"cms_maintain.html?m_id="+tableData[i][0]+"\" onclick=\"maintainMember("+ this +")\">維護</a>" */
+			            /* "<a id='"+maintainId+"' class=\"edit\" href=\"cms_maintain.html?m_id="+tableData[i][0]+"\" onclick=\"maintainMember('"+maintainId+"')\">維護</a>" */
+			            "<a id='"+maintainId+"' href=\"cms_maintain.html?m_id="+tableData[i][0]+"\" onclick=\"maintainMember('"+maintainId+"')\">維護</a>"
+			        ]);
+			    });
+			    oTable.fnDraw();           // 重新繪製
+			};
+
+			/* Click event handler */
+			/* $('#table_grid tbody tr').live('click', function () {
+				var aData = oTable.fnGetData( this );
+				var iId = aData[0];
+				
+				if ( jQuery.inArray(iId, gaiSelected) == -1 )
+				{
+					gaiSelected[gaiSelected.length++] = iId;
+				}
+				else
+				{
+					gaiSelected = jQuery.grep(gaiSelected, function(value) {
+						return value != iId;
+					} );
+				}
+				
+				$(this).toggleClass('row_selected');
+			} ); */
+			
+			function maintainMember(id) {
+				//init GUI of ad creation
+				$("#" + id).colorbox({
+					iframe : true,
+					scrolling : false
+				});
+			}
+			
+			function setupWeb() {
+				window.location="cms_setup.html?username="+userName;
+			}
+			
+			function initAddGUI() {
+				window.location="cms_edit.html?mode=add&username="+userName;
+			}			
+			
+	        /* function buildTable(tableData) { <!-- 處理JSON的function -->
+	            var tableBody = $("#tableBody"); <!-- tableBody是<tbody>標籤ID,為dataTables.js所用 -->
+	            tableBody.html("");          <!-- 將<tbody>標籤內所有內容含標籤都清空 -->
+	            //add the table rows
+	            $.each(tableData, function(i) {   <!-- JSON處理迴圈，匿名function的參數i是取得JSON的{} -->
+	                tableBody.append('<tr></tr>');    <!-- <tbody>後新增一個<tr>標籤空間 -->
+	                var tr = $('tr:last', tableBody); <!-- 在<tbody>取得最後一個<tr> -->
+	                
+	                tr.append('<td>' + tableData[i][0] + '</td>');
+	                tr.append('<td>' + tableData[i][1] + '</td>');
+	                tr.append('<td>' + tableData[i][2] + '</td>');
+	                tr.append('<td></td>');
+	            });
+	            
+	            mytable = document.getElementById("example");
+	    		if(mytable==null)
+	    			return ;
+	    		for (i = 0; i < data.length; i++) {
+					var userid = data[i][0];
+					var username = data[i][1];
+					var args = data[i][7].split(" ");
+					newrow = mytable.insertRow(-1);
+					if (i%2==0)
+						newrow.className = "even gradeA";
+					else 
+						newrow.className = "odd gradeA";
+		    		var td1 = newrow.insertCell(-1);
+		    		td1.className = "center";
+		    		td1.innerHTML ="<div>"+username+"</div>";
+		    		var td2 = newrow.insertCell(-1);
+		    		td2.innerHTML ="<div>"+args[0]+"</div>";
+		    		td2.className = "center";
+		    		var td3 = newrow.insertCell(-1);
+		    		td3.innerHTML ="<div>"+args[1]+"</div>";
+		    		td3.className = "center";
+		    		var td4 = newrow.insertCell(-1);
+		    		td4.setAttribute("align", "center");
+		    		td4.className = "center";
+		    		var a = document.createElement("a");
+		    		//a.setAttribute("href", "#");
+		    		var img = document.createElement("img");							
+					img.setAttribute("border", "0");
+					img.setAttribute("src", "../examples_support/details_open.png");
+					img.setAttribute("style", "padding-top:2px;");
+					a.appendChild(img);
+		    		td4.appendChild(a); 
+		    		
+	        }; */
+	        
+			
+			function initEditGUI() {
+
+                $.ajax({                 <!-- Ajax主程式 -->
+			        type: "POST",
+			        url: "registry.php",
+			        data: "mode=getAll",
+			        dataType: "json",
+                    success: function(data, status){      <!-- 回傳成功的動作，status是HTTP status -->
+                        buildTable(data);     <!-- 呼叫上面的function -->
+                    },
+                    error: function(xhrInstance, status, xhrException) { <!-- 回傳失敗的處理function -->
+                        alert("failure:" + status);
+                    }
+                });
+                
+
+			    /* $.ajax({
+			        type: "POST",
+			        url: "registry.php",
+			        data: "mode=getAll",
+			        dataType: "json",
+			        success: function(data) {
+			        	mytable = document.getElementById("example");
+			    		if(mytable==null)
+			    			return ;
+			    		for (i = 0; i < data.length; i++) {
+							var userid = data[i][0];
+							var username = data[i][1];
+							var args = data[i][7].split(" ");
+							newrow = mytable.insertRow(-1);
+							if (i%2==0)
+								newrow.className = "even gradeA";
+							else 
+								newrow.className = "odd gradeA";
+				    		var td1 = newrow.insertCell(-1);
+				    		td1.className = "center";
+				    		td1.innerHTML ="<div>"+username+"</div>";
+				    		var td2 = newrow.insertCell(-1);
+				    		td2.innerHTML ="<div>"+args[0]+"</div>";
+				    		td2.className = "center";
+				    		var td3 = newrow.insertCell(-1);
+				    		td3.innerHTML ="<div>"+args[1]+"</div>";
+				    		td3.className = "center";
+				    		var td4 = newrow.insertCell(-1);
+				    		td4.setAttribute("align", "center");
+				    		td4.className = "center";
+				    		var a = document.createElement("a");
+				    		//a.setAttribute("href", "#");
+				    		var img = document.createElement("img");							
+							img.setAttribute("border", "0");
+							img.setAttribute("src", "../examples_support/details_open.png");
+							img.setAttribute("style", "padding-top:2px;");
+							a.appendChild(img);
+				    		td4.appendChild(a);
+				    		//td4.innerHTML = "<div><td align=\"center\"></td></div>";
+			    		}
+			    		
+			        }
+			    });  */
+				
+			    
+			}	        
+	    	function confirmLogout() {
+	    		answer = confirm("確定要登出?")
+	    		if (answer !=0)
+	    		{
+	    			location = "../../admin/index.html"
+	    		}
+	    	}	    	
+		</script>
+	</head>
+
+<body>
+<form id="myform">
+<table width="960px" align="center">
+<tr>
+	<td colspan="2">
+        <table width="100%" align="center" cellpadding="0" cellspacing="0">
+            <tr style="background-image:url(../pictures/backpic_cms_edit_page_header.png); background-repeat:repeat-x;">
+                <td height="84px" valign="top">
+                    <div id="logo_for_cms">freeAD</div>
+                </td>
+                <td height="84px" valign="middle" style="font-size:12px; text-align:right">
+                    <div id="btn_logout"><a onclick="confirmLogout()" href="#">登出</a></div>
+                    <div id="log_info">Hi, 系統管理員 您好</div>
+                </td>
+            </tr>
+        </table>
+	</td>
+</tr>
+
+<tr class="tr_main_edit_area">
+	<td class="td_left_nav" valign="top">
+    	<div class="left_nav"><img src="../pictures/icon_left_nav.png" style="margin-right:3px; padding-bottom:5px;" align="absmiddle"/><a onclick="setupWeb()" href="#">網站相關設定</a></div>
+        <div class="left_nav"><img src="../pictures/icon_left_nav.png" style="margin-right:3px; padding-bottom:5px;" align="absmiddle"/><a href="#">VIP 會員資料管理</a></div>
+        <div class="left_nav_sub_func_outter_frame">
+        	<div class="left_nav_sub_func" onclick="initAddGUI()"><a href="#">新增會員資料</a></div>
+            <div class="left_nav_sub_func" onclick="initEditGUI()"><a href="#">檢視會員資料</a></div>
+        </div>
+    </td>
+    <td class="td_right_main_func" valign="top" align="left">
+    	<div id="right_main_func_title">VIP 會員資料管理</div>
+        <div id="right_main_func_options">
+		<!-- <div id="demo"> -->
+        	<table cellpadding="0" cellspacing="0" border="0" class="display" id="table_grid" align="center">
+	        	<thead>
+	            	<tr>
+	                  <th width="80px">VIP 申請人ID</th>
+	                  <th width="230px">VIP 申請人姓名</th>
+	                  <th width="230px">權限截止時間</th>
+	                  <th width="70px">維護</th>
+	                </tr>
+	        	</thead>
+	        	<tbody id="tableBody">
+		        	<!-- <tr class="gradeA">
+	                  <td>張博鈞</td>
+	                  <td>2011/12/31</td>
+	                  <td>PM12:59</td>
+	                  <td align="center"><a href="#">檢視詳細資料</a> | <a href="#">編輯</a> | <a href="#">刪除</a></td>
+	                </tr>
+	                <tr class="gradeA">
+	                  <td>張博鈞</td>
+	                  <td>2011/12/31</td>
+	                  <td>PM12:59</td>
+	                  <td align="center"><a href="#">檢視詳細資料</a> | <a href="#">編輯</a> | <a href="#">刪除</a></td>
+	                </tr>
+	                <tr class="gradeA">
+	                  <td>張博鈞</td>
+	                  <td>2011/12/31</td>
+	                  <td>PM12:59</td>
+	                  <td align="center"><a href="#">檢視詳細資料</a> | <a href="#">編輯</a> | <a href="#">刪除</a></td>
+	                </tr> -->
+	        	</tbody>
+            </table>
+            </div>
+            <div class="spacer"></div>
+			<style type="text/css">
+				@import "../examples_support/syntax/css/shCore.css";
+			</style>
+			<script type="text/javascript" language="javascript" src="../examples_support/syntax/js/shCore.js"></script>
+    </td>
+</tr>
+<tr>
+	<td class="td_footer" colspan="2">
+    	All rights reserved by freeAD !
+    </td>
+</tr>
+</table>
+</form>
+</body>
+</html>
+

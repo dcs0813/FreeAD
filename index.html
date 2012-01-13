@@ -17,19 +17,19 @@ body {
 -->
 </style>
 <link href="css/colorbox.css" rel="stylesheet" />
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 <link href="css/main_structure.css" rel="stylesheet" type="text/css" />
-<script src="scripts/jquery-1.4.4.js" type="text/javascript"></script>
+<script src="scripts/jquery.min.js"></script>
+<script src="scripts/jquery-1.4.4.js" type="text/javascript？"></script>
 <script src="scripts/colorbox/jquery.colorbox.js"></script>
-<script type="text/javascript">
-
+<script>
 	/* 	
 		1: admin/root
 		2: VIP
 	*/
-	var memberLevel = 2;
-	var userName = "Ted";
+	var memberLevel = 3;
+	var userName = "";
 	var userId = "0";
+	
 	var rows = new Array(7);
 	rows[0] = new Array(4);
 	rows[1] = new Array(2);
@@ -50,401 +50,697 @@ body {
 	grid[6] = new Array("2cx1r", "1cx1r");
 	grid[7] = new Array("1cx1r", "1cx1r", "1cx1r", "2cx1r");
 
-	$(document).ready(function() {
-		initGUI();
+	$(document).ready(function(){
+		checkLogin();
+		initGUI();	
+		
+		$('#vipLogin').click(function() {
+			if ($('#vipLogin').text() == "VIP 登入") {
+				$.colorbox({
+					opacity : 0.9,
+					transition : "fade",
+					title : true,
+					href : "./htmfiles/vip_log_in.html"
+				});
+			}
+			else {
+				answer = confirm("確定要登出?")
+				if (answer !=0)
+				{
+					//refresh();
+					initGUI();
+					//refresh(-1, "guest");
+				}	
+			}
+		});
+		
 	});
 	
+	//index.html?id=%id&username=%username
+	function getValue(varname) {
+		var url = window.location.href;
+		var qparts = url.split("?");
+		if (qparts.length == 0) {
+			return "";
+		}
+		var query = qparts[1];
+		var vars = query.split("&");
+		var value = "";
+		for (i = 0; i < vars.length; i++) {
+			var parts = vars[i].split("=");
+			if (parts[0] == varname) {
+				value = parts[1];
+				break;
+			}
+		}
+		value = unescape(value);
+		value.replace(/\+/g, " ");
+		return value;
+	}
+	
+/* 	function refresh_iframe(path, id, name) {
+		alert("iframe refresh "+id);
+		window.location = path + "?id="+id+"&username="+name;		
+	}
+	
+	function refresh(id, name) {
+		alert("refresh "+id);
+		window.location="./index.html?id="+id+"&username="+name;		
+	}
+ */
+	/* function refresh_iframe(path) {
+		alert("iframe refresh "+userId);
+		window.location = path + "?id="+userId+"&username="+userName;		
+	}
+	
+	function refresh() {
+		alert("refresh "+userId);
+		window.location="./index.html?id="+userId+"&username="+userName;		
+	} */
+	
+	function checkLogin() {
+		if (window.location.href.indexOf("?") != -1) {
+			var status = getValue("status");
+			var mode =  getValue("mode");
+			userName = getValue("username");
+			if (status == "loginSuccess") {
+				userId = getValue("id");
+				alert(userName + ", 歡迎回來!");
+				console.log(userId);
+				//refresh(userId, userName);
+			} 
+			else if (status == "loginFailed") {
+				alert("登入失敗, 請檢查您的帳號密碼!");
+				userName = "";
+				userId = "";
+				//refresh(userId, userName);
+			}
+			if (mode == "maintainAd") {
+				if (status == "0") {
+					userId = getValue("id");
+					alert("修改廣告成功!");
+				} 
+				else if (status == "1") {
+					alert("修改廣告失敗! 不支援上傳的附檔名。");
+					userName = "";
+					userId = "";
+				}
+				else if (status == "2") {
+					alert("修改廣告失敗! 超出檔案大小限制。");
+					userName = "";
+					userId = "";
+				}
+				else if (status == "3") {
+					alert("修改廣告失敗! 上傳的圖片已經存在。");
+					userName = "";
+					userId = "";
+				}
+				else if (status == "4") {
+					alert("修改廣告失敗! 資料庫寫入失敗。");
+					userName = "";
+					userId = "";
+				}
+				else if (status == "5") {
+					
+				}
+				else if (status == "6") {
+					alert("修改廣告失敗! 廣告標題超過 128字元的限制。" );
+					userName = "";
+					userId = "";
+				}
+				else if (status == "7") {
+					alert("修改廣告失敗! 廣告標題超過 1024字元的限制。");
+					userName = "";
+					userId = "";
+				}
+				//window.location="../index.html?id="+id+"&username="+name;		
+				//refresh(userId, userName);
+			}
+			
+			$("#welcome").hide();
+			if (userName!="") {
+				memberLevel = 2;
+				if (userName=="guest") {
+					memberLevel = 3;
+				}
+				else {
+					$("#vipLogin").html("VIP 登出")
+					$("#welcome").show();
+					$("#welcome").html("  您好，" +userName);				
+				} 
+			}
+			if (userName == "root" || userName == "admin") 
+				memberLevel = 1;
+			
+		}
+		else {
+			//refresh();
+			initGUI();
+			//refresh(-1, "guest");
+		}
+	}
+	
 	function initGUI() {
-		$.post("htmfiles/list_ad.php",
-			function(data) {
-				// init value
-				for (r = 0; r<rows.length; r++) {
-					for (c = 0; c<rows[r].length; c++) {
+		$.post("htmfiles/list_ad.php", {mode:"getAll"}, function(data) {
+			// init value
+			for (r = 0; r < rows.length; r++) {
+				for (c = 0; c < rows[r].length; c++) {
+					rows[r][c] = "";
+					var position = "r" + r.toString() + "c" + c.toString();
+					$('#ad_' + position).remove();
+				}
+			}
+
+			for (i = 0; i < data.length; i++) {
+				var row = data[i];
+				var user = data[i][0];
+				var position = data[i][1];
+				var args = position.split("c");
+				var r = args[0].split("r")[1];
+				var c = args[1];
+				var title = data[i][2];
+				var content = data[i][3];
+				var picture = data[i][4];
+				var link = data[i][5];
+				var phone = data[i][6];
+				var expire = data[i][7]; // 2012-01-01 15:20:21
+				var trialExpire = data[i][8];
+				var identify = data[i][9];
+				var a_id = data[i][10];
+				if (identify == 0) // guest/trial 
+					expire = trialExpire;
+				//rows[r][c] = position + "%" + expire; // has advertising
+				
+				var editable = memberLevel == 1 || 
+								memberLevel == 2 && user == userName || memberLevel == 2 && identify == 0 ||
+								memberLevel == 3 && identify == 0;// admin, VIP user delete itself
+				var deletable = editable;
+				
+				var td = document.getElementById(position);
+				switch (grid[r][c]) {
+				case "2cx2r":
+					var ad = document.createElement("div");
+					ad.setAttribute("id", "ad_" + position);
+					ad.className = "ad_2cx2r";
+					var top = document.createElement("div");
+					top.className = "ad_outter_frame_" + grid[r][c];
+					var adTitle = document.createElement("div");
+					adTitle.setAttribute("id", "title_" + position);
+					adTitle.className = "ad_title_2cx2r";
+					adTitle.innerHTML = title;
+					var addContent = document.createElement("div");
+					addContent.setAttribute("id", "content_" + position);
+					addContent.className = "ad_content_2cx2r";
+					addContent.innerHTML = content;
+					var addPicture = document.createElement("div");
+					addPicture.setAttribute("id", "picture_" + position);
+					addPicture.className = "ad_picture_2cx2r";
+					var photo = document.createElement("img");
+					photo.setAttribute("border", "0");
+					photo.onerror = function () {
+						photo.setAttribute("src", "uploads/" + "info_no_pic_2cx2r.png");
+					};
+					if (picture == "") 
+						photo.setAttribute("src", "uploads/" + "info_no_pic_2cx2r.png");
+					else
+						photo.setAttribute("src", "uploads/" + picture);
+					photo.setAttribute("width", "388px;");
+					addPicture.appendChild(photo);
+					top.appendChild(adTitle);
+					top.appendChild(addContent);
+					top.appendChild(addPicture);
+					var down = document.createElement("div");
+					down.setAttribute("id", "banner_" + position);
+					down.className = "ad_ui_" + grid[r][c];
+					var a = document.createElement("a");
+					a.setAttribute("href", link);
+					a.setAttribute("target", "_blank");
+					a.setAttribute("style", "text-decoration:none; color:#000;");
+					var imgLink = document.createElement("img");
+					imgLink.setAttribute("border", "0");
+					imgLink.setAttribute("src", "pictures/icon_link.png");
+					imgLink.setAttribute("style", "margin-left:12px; padding-top:2px;");
+					a.appendChild(imgLink);
+
+					down.appendChild(a);
+					var imgPhone = document.createElement("img");
+					imgPhone.setAttribute("title", phone);
+					imgPhone.setAttribute("alt", phone);
+					imgPhone.setAttribute("src", "pictures/icon_phone.png");
+					imgPhone.setAttribute("style", "padding-top:2px;");
+					down.appendChild(imgPhone);
+					if (editable) {
+						var a = document.createElement("a");
+						a.setAttribute("href",
+								"htmfiles/maintain_ad.html?a_id=" + a_id + "&m_id=" + userId
+								+ "&username=" + userName);						
+						a.setAttribute("style", "text-decoration:none; color:#000;");
+						a.setAttribute("id", "edit_" + position);
+						a.onclick = function() {
+							editOnClick(this);
+						};
+						var img = document.createElement("img");
+						img.setAttribute("id", "edit_" + position);
+						img.setAttribute("border", "0");
+						img.setAttribute("src", "pictures/icon_edit.png");
+						img.setAttribute("style", "padding-top:2px;");
+						a.appendChild(img);
+						down.appendChild(a);
+					}
+					if (deletable) {
+						var a = document.createElement("a");
+						a.setAttribute("href", "#");
+						a.setAttribute("style",
+								"text-decoration:none; color:#000;");
+						a.setAttribute("id", "delete_" + a_id);
+						a.onclick = function() {
+							deleteOnClick(this);
+						};
+						var img = document.createElement("img");						
+						img.setAttribute("border", "0");
+						img.setAttribute("src", "pictures/icon_delete.png");
+						img.setAttribute("style", "padding-top:2px;");
+						a.appendChild(img);
+						down.appendChild(a);
+					}
+					var time = document.createElement("div");
+					time.className = "count_down_area";
+					var imgTime = document.createElement("img");
+					imgTime.setAttribute("src", "pictures/icon_clock.png");
+					imgTime.setAttribute("style", "padding-bottom:3px;");
+					imgTime.setAttribute("align", "absmiddle");
+
+					time.appendChild(imgTime);
+					var span = document.createElement("span"); // "12/29/2011 2:00 PM +0800"
+					span.setAttribute("id", "countdown_" + position);
+					span.innerHTML = "23H : 59M : 59S ";
+					time.appendChild(span);
+					down.appendChild(time);
+					ad.appendChild(top);
+					ad.appendChild(down);
+					td.appendChild(ad);
+					if (CountBack("countdown_" + position, grid[r][c], getSecs(expire + " +0800")) == -1) {
 						rows[r][c] = "";
+						sqlDelete(a_id);
+						$('#ad_' + position).remove();
+					}
+					else {
+						rows[r][c] = position + "%" + expire; // has advertising					
+					}
+					break;
+				case "2cx1r":
+					var ad = document.createElement("div");
+					ad.setAttribute("id", "ad_" + position);
+					ad.className = "ad_2cx1r";
+					var top = document.createElement("div");
+					top.className = "ad_outter_frame_" + grid[r][c];
+					var adTitle = document.createElement("div");
+					adTitle.setAttribute("id", "title_" + position);
+					adTitle.className = "ad_title_2cx1r";
+					adTitle.innerHTML = title;
+					var addContent = document.createElement("div");
+					addContent.setAttribute("id", "content_" + position);
+					addContent.className = "ad_content_2cx1r";
+					addContent.innerHTML = content;
+					var addPicture = document.createElement("div");
+					addPicture.setAttribute("id", "picture_" + position);
+					addPicture.className = "ad_picture_2cx1r";
+					var photo = document.createElement("img");
+					photo.setAttribute("border", "0");
+					photo.onerror = function () {
+						//alert('error loading ' + this.src);
+						this.src = "uploads/info_no_pic_2cx1r.png"; // place your error.png image instead
+					};
+					if (picture == "") 
+						picture = "info_no_pic_2cx1r.png";
+					else
+						photo.setAttribute("src", "uploads/" + picture);
+					photo.setAttribute("width", "185px;");
+					addPicture.appendChild(photo);
+					top.appendChild(adTitle);
+					top.appendChild(addContent);
+
+					var down = document.createElement("div");
+					down.setAttribute("id", "banner_" + position);
+					down.className = "ad_ui_" + grid[r][c];
+					var a = document.createElement("a");
+					a.setAttribute("href", link);
+					a.setAttribute("target", "_blank");
+					a.setAttribute("style", "text-decoration:none; color:#000;");
+					var imgLink = document.createElement("img");
+					imgLink.setAttribute("border", "0");
+					imgLink.setAttribute("src", "pictures/icon_link.png");
+					imgLink.setAttribute("style", "margin-left:12px; padding-top:2px;");
+					a.appendChild(imgLink);
+
+					down.appendChild(a);
+					var imgPhone = document.createElement("img");
+					imgPhone.setAttribute("title", phone);
+					imgPhone.setAttribute("alt", phone);
+					imgPhone.setAttribute("src", "pictures/icon_phone.png");
+					imgPhone.setAttribute("style", "padding-top:2px;");
+					down.appendChild(imgPhone);
+					if (editable) {
+						var a = document.createElement("a");
+						a.setAttribute("href",
+								"htmfiles/maintain_ad.html?a_id=" + a_id + "&m_id=" + userId
+								+ "&username=" + userName);	
+						a.setAttribute("style", "text-decoration:none; color:#000;");
+						a.setAttribute("id", "edit_" + position);
+						a.onclick = function() {
+							editOnClick(this);
+						};
+						var img = document.createElement("img");
+						img.setAttribute("border", "0");
+						img.setAttribute("src", "pictures/icon_edit.png");
+						img.setAttribute("style", "padding-top:2px;");
+						a.appendChild(img);
+						down.appendChild(a);
+					}
+					if (deletable) {
+						var a = document.createElement("a");
+						a.setAttribute("href", "#");
+						a.setAttribute("style", "text-decoration:none; color:#000;");
+						a.setAttribute("id", "delete_" + a_id);
+						a.onclick = function() {
+							deleteOnClick(this);
+						};
+						var img = document.createElement("img");
+						img.setAttribute("border", "0");
+						img.setAttribute("src", "pictures/icon_delete.png");
+						img.setAttribute("style", "padding-top:2px;");
+						a.appendChild(img);
+						down.appendChild(a);
+					}
+					var time = document.createElement("div");
+					time.className = "count_down_area";
+					var imgTime = document.createElement("img");
+					imgTime.setAttribute("src", "pictures/icon_clock.png");
+					imgTime.setAttribute("style", "padding-bottom:3px;");
+					imgTime.setAttribute("align", "absmiddle");
+
+					time.appendChild(imgTime);
+					var span = document.createElement("span"); // "12/29/2011 2:00 PM +0800"
+					span.setAttribute("id", "countdown_" + position);
+					span.innerHTML = "23H : 59M : 59S ";
+					time.appendChild(span);
+					down.appendChild(time);
+					ad.appendChild(top);
+					ad.appendChild(addPicture);
+					ad.appendChild(down);
+					td.appendChild(ad);					
+					if (CountBack("countdown_" + position, grid[r][c], getSecs(expire + " +0800")) == -1) {
+						rows[r][c] = "";
+						sqlDelete(a_id);
+						$('#ad_' + position).remove();
+					}
+					else {
+						rows[r][c] = position + "%" + expire; // has advertising					
+					}
+					
+					break;
+				case "1cx1r":
+					var ad = document.createElement("div");
+					ad.setAttribute("id", "ad_" + position);
+					ad.className = "ad_1cx1r";
+					var top = document.createElement("div");
+					var adTitle = document.createElement("div");
+					adTitle.setAttribute("id", "title_" + position);
+					adTitle.className = "ad_title_1cx1r";
+					adTitle.innerHTML = title;
+					var addContent = document.createElement("div");
+					addContent.setAttribute("id", "content_" + position);
+					addContent.className = "ad_content_1cx1r";
+					addContent.innerHTML = content;
+					var addPicture = document.createElement("div");
+					addPicture.setAttribute("id", "picture_" + position);
+					addPicture.className = "ad_picture_1cx1r";
+					var photo = document.createElement("img");
+					photo.setAttribute("border", "0");
+					photo.onerror = function () {
+						//alert('error loading ' + this.src);
+						this.src = "uploads/info_no_pic_1cx1r.png"; // place your error.png image instead
+					};
+					if (picture == "") 
+						picture = "info_no_pic_1cx1r.png";
+					else
+						photo.setAttribute("src", "uploads/" + picture);
+					photo.setAttribute("width", "185px;");
+					addPicture.appendChild(photo);
+
+					top.appendChild(adTitle);
+					top.appendChild(addContent);
+					top.appendChild(addPicture);
+
+					var down = document.createElement("div");
+					down.setAttribute("id", "banner_" + position);
+					down.className = "ad_ui_" + grid[r][c];
+					var a = document.createElement("a");
+					a.setAttribute("href", link);
+					a.setAttribute("target", "_blank");
+					a.setAttribute("style", "text-decoration:none; color:#000;");
+					var imgLink = document.createElement("img");
+					imgLink.setAttribute("border", "0");
+					imgLink.setAttribute("src", "pictures/icon_link.png");
+					imgLink.setAttribute("style", "margin-left:3px; padding-top:2px;");
+					a.appendChild(imgLink);
+
+					down.appendChild(a);
+					var imgPhone = document.createElement("img");
+					imgPhone.setAttribute("title", phone);
+					imgPhone.setAttribute("alt", phone);
+					imgPhone.setAttribute("src", "pictures/icon_phone.png");
+					imgPhone.setAttribute("style", "padding-top:2px;");
+					down.appendChild(imgPhone);
+					if (editable) {
+						var a = document.createElement("a");
+						a.setAttribute("style", "text-decoration:none; color:#000;");
+						a.setAttribute("id", "edit_" + position);
+						a.setAttribute("href",
+								"htmfiles/maintain_ad.html?a_id=" + a_id + "&m_id=" + userId
+								+ "&username=" + userName);	
+						a.onclick = function() {
+							editOnClick(this);
+						};
+						var img = document.createElement("img");
+						img.setAttribute("border", "0");
+						img.setAttribute("src", "pictures/icon_edit.png");
+						img.setAttribute("style", "padding-top:2px;");
+						a.appendChild(img);
+						down.appendChild(a);
+					}
+					if (deletable) {
+						var a = document.createElement("a");
+						a.setAttribute("href", "#");
+						a.setAttribute("style",
+								"text-decoration:none; color:#000;");
+						a.setAttribute("id", "delete_" + a_id);
+						a.onclick = function() {
+							deleteOnClick(this);
+						};
+						var img = document.createElement("img");
+						img.setAttribute("border", "0");
+						img.setAttribute("src", "pictures/icon_delete.png");
+						img.setAttribute("style", "padding-top:2px;");
+						a.appendChild(img);
+						down.appendChild(a);
+					}
+					var time = document.createElement("div");
+					time.className = "count_down_area_for_1cx1r";
+					var span = document.createElement("span"); // "12/29/2011 2:00 PM +0800"
+					span.setAttribute("id", "countdown_" + position);
+					span.innerHTML = "23:59:59";
+					time.appendChild(span);
+					down.appendChild(time);
+					ad.appendChild(top);
+					ad.appendChild(down);
+					td.appendChild(ad);					
+					if (CountBack("countdown_" + position, grid[r][c], getSecs(expire + " +0800")) == -1) {
+						rows[r][c] = "";
+						sqlDelete(a_id);
+						$('#ad_' + position).remove();
+					}
+					else {
+						rows[r][c] = position + "%" + expire; // has advertising					
+					}
+					break;
+				}
+
+			}
+			// alternative innerHTML to DOM method
+			for (r = 0; r < rows.length; r++) {
+				for (c = 0; c < rows[r].length; c++) {
+					if (rows[r][c] == "") {
 						var position = "r" + r.toString() + "c" + c.toString();
-						$('#ad_'+position).remove();
+						var td = document.getElementById(position);
+						var ad = document.createElement("div");
+						
+						ad.setAttribute("id", "ad_" + position);
+						switch (grid[r][c]) {
+						case "2cx2r":
+							ad.className = "ad_2cx2r";
+							break;
+						case "2cx1r":
+							ad.className = "ad_2cx1r";
+							break;
+						case "1cx1r":
+							ad.className = "ad_1cx1r";
+							break
+						}
+						var add = document.createElement("div");
+						add.className = "add_new_ad";
+						var a = document.createElement("a");
+						a.setAttribute("href",
+								"htmfiles/add_new_ad.html?mode=add&position="
+										+ position + "&m_id=" + userId
+										+ "&username=" + userName);
+						//a.className = "addiframe";
+						a.setAttribute("id", "create_" + position);
+						a.onclick = function() {
+							addOnClick(this);
+						};
+						a.setAttribute("style", "text-decoration:none");
+						var img = document.createElement("img");
+						img.setAttribute("border", "0");
+						img.setAttribute("src", "pictures/icon_add.png");
+						img.setAttribute("style",
+								"margin-right:3px; padding-bottom:5px;");
+						img.setAttribute("align", "absmiddle");
+						a.appendChild(img);
+						a.appendChild(document.createTextNode("新增廣告內容 "));
+						add.appendChild(a);
+						ad.appendChild(add);
+						td.appendChild(ad);
 					}
 				}
-				
-				for (i = 0; i< data.length; i++) {
-					var user = data[i][0];
+			}
 
-					var editable = memberLevel == 1 || memberLevel == 2 && user == userName; // admin, VIP user delete itself
-					var deletable = editable || memberLevel != 1 && memberLevel != 2 && user == ""; // editable, general user can delete trial
-					
-					var position = data[i][1];
-					var args = position.split("c")
-					var r = args[0].split("r")[1];
-					var c = args[1];
-					
-					var title = data[i][2];
-					var content = data[i][3];
-					var picture = data[i][4];
-					var link = data[i][5];
-					var phone = data[i][6];
-					var expire = data[i][7]; // 2012-01-01 15:20:21
+		}, "json");
 
-					rows[r][c] = position + "%" + expire; // has advertising
-					
-					var td = document.getElementById(position);
-					switch (grid[r][c]) {
-					case "2cx2r":
-						var ad = document.createElement("div");
-						ad.setAttribute("id", "ad_" + position);
-						ad.className = "ad_2cx2r";
-						var top = document.createElement("div");
-						top.className = "ad_outter_frame_" + grid[r][c];
-						var adTitle = document.createElement("div");
-						adTitle.setAttribute("id", "title_" + position);
-						adTitle.className = "ad_title_2cx2r";
-						adTitle.innerHTML = title;
-						var addContent = document.createElement("div");
-						addContent.setAttribute("id", "content_" + position);
-						addContent.className = "ad_content_2cx2r";
-						addContent.innerHTML = content;
-						var addPicture = document.createElement("div");
-						addPicture.setAttribute("id", "picture_" + position);
-						addPicture.className = "ad_picture_2cx2r";
-						top.appendChild(adTitle);
-						top.appendChild(addContent);
-						top.appendChild(addPicture);
-						
-						var down = document.createElement("div");
-						down.setAttribute("id", "banner_" + position);
-						down.className = "ad_ui_" + grid[r][c];
-						var a = document.createElement("a");
-						a.setAttribute("href", "#");
-						a.setAttribute("style", "text-decoration:none; color:#000;");
-						var imgLink = document.createElement("img");
-						imgLink.setAttribute("border", "0");
-						imgLink.setAttribute("src", "pictures/icon_link.png");
-						imgLink.setAttribute("style", "margin-left:12px; padding-top:2px;");
-						a.appendChild(imgLink);
-						
-						down.appendChild(a);
-						var imgPhone = document.createElement("img");
-						imgPhone.setAttribute("title", phone);
-						imgPhone.setAttribute("alt", phone);
-						imgPhone.setAttribute("src", "pictures/icon_phone.png");
-						imgPhone.setAttribute("style", "padding-top:2px;");
-						down.appendChild(imgPhone);
-						
-						if (editable) {
-							var a = document.createElement("a");
-							a.setAttribute("href", "#");
-							a.setAttribute("style", "text-decoration:none; color:#000;");
-							var img = document.createElement("img");
-							img.setAttribute("id", "edit_"+position);
-							img.setAttribute("border", "0");
-							img.setAttribute("src", "pictures/icon_edit.png");
-							img.setAttribute("style", "padding-top:2px;");
-							a.appendChild(img);
-							down.appendChild(a);
-						}
-						if (deletable) {
-							var a = document.createElement("a");
-							a.setAttribute("href", "#");
-							a.setAttribute("style", "text-decoration:none; color:#000;");
-							var img = document.createElement("img");
-							img.setAttribute("id", "delete_"+position);
-							img.onclick = function() { deleteOnClick(this); };
-							img.setAttribute("border", "0");
-							img.setAttribute("src", "pictures/icon_delete.png");
-							img.setAttribute("style", "padding-top:2px;");
-							a.appendChild(img);
-							down.appendChild(a);
-						}						
-						var time = document.createElement("div");
-						time.className = "count_down_area";
-						var imgTime = document.createElement("img");
-						imgTime.setAttribute("src", "pictures/icon_clock.png");
-						imgTime.setAttribute("style", "padding-bottom:3px;");
-						imgTime.setAttribute("align", "absmiddle");
-						
-						time.appendChild(imgTime);
-						var span = document.createElement("span"); // "12/29/2011 2:00 PM +0800"
-						span.setAttribute("id", "countdown_"+position);
-						span.innerHTML = "23H : 59M : 59S ";
-						time.appendChild(span); 
-						down.appendChild(time);						
-						ad.appendChild(top);
-						ad.appendChild(down);						
-						td.appendChild(ad);
-						CountBack("countdown_"+position, grid[r][c], getSecs(expire));
-						break;
-					case "2cx1r":		
-						var ad = document.createElement("div");
-						ad.setAttribute("id", "ad_" + position);
-						ad.className = "ad_2cx1r";
-						var top = document.createElement("div");
-						top.className = "ad_outter_frame_" + grid[r][c];
-						var adTitle = document.createElement("div");
-						adTitle.setAttribute("id", "title_" + position);
-						adTitle.className = "ad_title_2cx1r";
-						adTitle.innerHTML = title;
-						var addContent = document.createElement("div");
-						addContent.setAttribute("id", "content_" + position);
-						addContent.className = "ad_content_2cx1r";
-						addContent.innerHTML = content;
-						var addPicture = document.createElement("div");
-						addPicture.setAttribute("id", "picture_" + position);
-						addPicture.className = "ad_picture_2cx1r";
-						top.appendChild(adTitle);
-						top.appendChild(addContent);
-
-						var down = document.createElement("div");
-						down.setAttribute("id", "banner_" + position);
-						down.className = "ad_ui_" + grid[r][c];
-						var a = document.createElement("a");
-						a.setAttribute("href", "#");
-						a.setAttribute("style", "text-decoration:none; color:#000;");
-						var imgLink = document.createElement("img");
-						imgLink.setAttribute("border", "0");
-						imgLink.setAttribute("src", "pictures/icon_link.png");
-						imgLink.setAttribute("style", "margin-left:12px; padding-top:2px;");
-						a.appendChild(imgLink);
-						
-						down.appendChild(a);
-						var imgPhone = document.createElement("img");
-						imgPhone.setAttribute("title", phone);
-						imgPhone.setAttribute("alt", phone);
-						imgPhone.setAttribute("src", "pictures/icon_phone.png");
-						imgPhone.setAttribute("style", "padding-top:2px;");
-						down.appendChild(imgPhone);
-						if (editable) {
-							var a = document.createElement("a");
-							a.setAttribute("href", "#");
-							a.setAttribute("style", "text-decoration:none; color:#000;");
-							var img = document.createElement("img");
-							img.setAttribute("id", "edit_"+position);
-							img.setAttribute("border", "0");
-							img.setAttribute("src", "pictures/icon_edit.png");
-							img.setAttribute("style", "padding-top:2px;");
-							a.appendChild(img);
-							down.appendChild(a);
-						}
-						if (deletable) {
-							var a = document.createElement("a");							
-							a.setAttribute("href", "#");
-							a.setAttribute("style", "text-decoration:none; color:#000;");
-							var img = document.createElement("img");
-							img.setAttribute("id", "delete_"+position);
-							img.onclick = function() { deleteOnClick(this); };
-							img.setAttribute("border", "0");
-							img.setAttribute("src", "pictures/icon_delete.png");
-							img.setAttribute("style", "padding-top:2px;");
-							a.appendChild(img);
-							down.appendChild(a);
-						}
-						var time = document.createElement("div");
-						time.className = "count_down_area";
-						var imgTime = document.createElement("img");
-						imgTime.setAttribute("src", "pictures/icon_clock.png");
-						imgTime.setAttribute("style", "padding-bottom:3px;");
-						imgTime.setAttribute("align", "absmiddle");
-						
-						time.appendChild(imgTime);
-						var span = document.createElement("span"); // "12/29/2011 2:00 PM +0800"
-						span.setAttribute("id", "countdown_"+position);
-						span.innerHTML = "23H : 59M : 59S ";
-						time.appendChild(span); 
-						down.appendChild(time);						
-						ad.appendChild(top);
-						ad.appendChild(addPicture);
-						ad.appendChild(down);
-						td.appendChild(ad);
-						CountBack("countdown_"+position, grid[r][c], getSecs(expire));
-						
-						break;
-					case "1cx1r":
-						var ad = document.createElement("div");
-						ad.setAttribute("id", "ad_" + position);
-						ad.className = "ad_1cx1r";
-						var top = document.createElement("div");
-						var adTitle = document.createElement("div");
-						adTitle.setAttribute("id", "title_" + position);
-						adTitle.className = "ad_title_1cx1r";
-						adTitle.innerHTML = title;
-						var addContent = document.createElement("div");
-						addContent.setAttribute("id", "content_" + position);
-						addContent.className = "ad_content_1cx1r";
-						addContent.innerHTML = content;
-						var addPicture = document.createElement("div");
-						addPicture.setAttribute("id", "picture_" + position);
-						addPicture.className = "ad_picture_1cx1r";
-						top.appendChild(adTitle);
-						top.appendChild(addContent);
-						top.appendChild(addPicture);
-
-						var down = document.createElement("div");
-						down.setAttribute("id", "banner_" + position);
-						down.className = "ad_ui_" + grid[r][c];
-						var a = document.createElement("a");
-						a.setAttribute("href", "#");
-						a.setAttribute("style", "text-decoration:none; color:#000;");
-						var imgLink = document.createElement("img");
-						imgLink.setAttribute("border", "0");
-						imgLink.setAttribute("src", "pictures/icon_link.png");
-						imgLink.setAttribute("style", "margin-left:3px; padding-top:2px;");
-						a.appendChild(imgLink);
-						
-						down.appendChild(a);
-						var imgPhone = document.createElement("img");
-						imgPhone.setAttribute("title", phone);
-						imgPhone.setAttribute("alt", phone);
-						imgPhone.setAttribute("src", "pictures/icon_phone.png");
-						imgPhone.setAttribute("style", "padding-top:2px;");
-						down.appendChild(imgPhone);
-						if (editable) {
-							var a = document.createElement("a");
-							a.setAttribute("href", "#");
-							a.setAttribute("style", "text-decoration:none; color:#000;");
-							var img = document.createElement("img");
-							img.setAttribute("id", "edit_"+position);
-							img.setAttribute("border", "0");
-							img.setAttribute("src", "pictures/icon_edit.png");
-							img.setAttribute("style", "padding-top:2px;");
-							a.appendChild(img);
-							down.appendChild(a);
-						}
-						if (deletable) {
-							var a = document.createElement("a");							
-							a.setAttribute("href", "#");
-							a.setAttribute("style", "text-decoration:none; color:#000;");
-							var img = document.createElement("img");
-							img.setAttribute("id", "delete_"+position);
-							img.onclick = function() { deleteOnClick(this); };
-							img.setAttribute("border", "0");
-							img.setAttribute("src", "pictures/icon_delete.png");
-							img.setAttribute("style", "padding-top:2px;");
-							a.appendChild(img);
-							down.appendChild(a);
-						}
-						var time = document.createElement("div");
-						time.className = "count_down_area_for_1cx1r";
-						var span = document.createElement("span"); // "12/29/2011 2:00 PM +0800"
-						span.setAttribute("id", "countdown_"+position);
-						span.innerHTML = "23:59:59";
-						time.appendChild(span); 
-						down.appendChild(time);						
-						ad.appendChild(top);
-						ad.appendChild(down);
-						td.appendChild(ad);
-						CountBack("countdown_"+position, grid[r][c], getSecs(expire));
-						break;
-					}
-					
-				}
-				// alternative innerHTML to DOM method
-				for (r = 0; r<rows.length; r++) {
-					for (c = 0; c<rows[r].length; c++) {
-						if (rows[r][c]=="") {
-							var position = "r" + r.toString() + "c" + c.toString();
-							var td = document.getElementById(position);
-							var ad = document.createElement("div");
-							ad.setAttribute("id", "ad_"+position);
-							switch (grid[r][c]) {
-							case "2cx2r":
-								ad.className = "ad_2cx2r";
-								break;
-							case "2cx1r":
-								ad.className = "ad_2cx1r";
-								break;
-							case "1cx1r":
-								ad.className = "ad_1cx1r";
-								break
-							}
-							var add = document.createElement("div");
-							add.className = "add_new_ad";
-							add.onclick = function() { addOnClick(this); };
-							add.setAttribute("id", "add_"+position);
-							var a = document.createElement("a");
-							a.setAttribute("href", "#");
-							a.setAttribute("style", "text-decoration:none; color:#000;");
-							var img = document.createElement("img");
-							img.setAttribute("border", "0");
-							img.setAttribute("src", "pictures/icon_add.png");
-							img.setAttribute("style", "margin-right:3px; padding-bottom:5px;");
-							img.setAttribute("align", "absmiddle");
-							a.appendChild(img);
-							a.appendChild(document.createTextNode("新增廣告內容 "));
-							add.appendChild(a);							
-							ad.appendChild(add);
-							td.appendChild(ad);
-						}
-					}
-				}
-				
-			}, "json");
-		
 		//setTimeout("initGUI();", 3000);
 	}
 	
+	function joinOnClick() {
+		$.colorbox({
+			opacity : 0.9,
+			transition : "fade",
+			title : true,
+			href : "./htmfiles/join_vip.html"
+		});
+	}
+	
+	function policyOnClick() {
+		$.colorbox({
+			opacity : 0.9,
+			transition : "fade",
+			title : true,
+			href : "./htmfiles/private_policy.html"
+		});
+	}
+	
+	function howtoOnClick() {
+		$.colorbox({
+			opacity : 0.9,
+			transition : "fade",
+			title : true,
+			href : "./htmfiles/how_to_use.html"
+		});
+	}
+	
 	function addOnClick(item) {
-		//alert("add " + $(item).attr("id"));
 		//init GUI of ad creation
-		var position = $(item).attr("id").split("_")[0];
-		$.colorbox({opacity:0.9, transition:"fade", title:true, 
-			href:"./htmfiles/add_new_ad.html?mode=add&position="+position+"&m_id="+userId});
+		$("#" + $(item).attr("id")).colorbox({
+			iframe : true,
+			scrolling : false
+		});
 	}
 
 	function editOnClick(item) {
-		//alert("edit" + $(item).attr("id"));
 		//init GUI of ad creation
-		var position = $(item).attr("id").split("_")[0];
-		$.colorbox({opacity:0.9, transition:"fade", title:true, 
-			href:"./htmfiles/add_new_ad.html?mode=exit&position="+position+"&m_id="+userId});
+		$("#" + $(item).attr("id")).colorbox({
+			iframe : true,
+			scrolling : false
+		});
+	}
+	
+	function sqlDelete(a_id) {
+		$.post("htmfiles/maintain_ad.php", {is_delete:"1", maintainAId:a_id}, 
+			function(data) {
+				if (data.result == "0") {
+					//initGUI();
+				}
+		}, "json");
 	}
 	
 	function deleteOnClick(item) {
-		//alert("del " + $(item).attr("id"));
-		var position = $(item).attr("id").split("_")[0];
-		//init GUI of ad creation
-		
-		
+		var answer = confirm("確定要刪除？")
+		if (answer){
+			var temp = $(item).attr("id");
+			var a_id = temp.split("_")[1];
+	        $.ajax({
+		        type: "POST",
+		        url: "htmfiles/maintain_ad.php",
+		        data: "is_delete=1&maintainAId="+a_id,
+		        dataType: "json",
+		        success: function(data) {
+					//alert(data.registry_check);					
+					if (data.result == "0") {
+						alert("成功刪除廣告。");
+						//refresh(userId, userName);
+						//refresh();
+						initGUI();
+					} 
+					else if (data.result == "4") {
+						alert("刪除失敗!");
+					}
+		        }
+	        });
+			//alert("del " + $(item).attr("id"));
+			//var position = $(item).attr("id").split("_")[1];
+			//init GUI of ad creation
+		}
 	}
-	
-	function Calcage(secs, num1, num2)
-	{
-		s = ((Math.floor(secs/num1))%num2).toString();
-		if (s.length < 2) 
-		{	
+
+	function Calcage(secs, num1, num2) {
+		s = ((Math.floor(secs / num1)) % num2).toString();
+		if (s.length < 2) {
 			s = "0" + s;
 		}
 		return (s);
 	}
-	
-	function getSecs (myTargetDate) {
-		var dthen	= new Date(myTargetDate);
-		var dnow	= new Date();
-		ddiff		= new Date(dthen-dnow);
-		secs		= Math.floor(ddiff.valueOf()/1000);	
+
+	function getSecs(myTargetDate) {
+		var dthen = new Date(myTargetDate);
+		var dnow = new Date();
+		ddiff = new Date(dthen - dnow);
+		secs = Math.floor(ddiff.valueOf() / 1000);
 		return secs;
 	}
-	
-	function CountBack(myDiv, grid, secs)
-	{	
-	    var DisplayStr;
-	    var DisplayFormat = "%%D%%D %%H%%H:%%M%%M:%%S%%S";
-	    if (grid == "1cx1r") 
-	    	DisplayFormat = "%%D%%D,%%H%%:%%M%%:%%S%%";
-	    DisplayStr = DisplayFormat.replace(/%%D%%/g,	Calcage(secs,86400,100000));
-	    DisplayStr = DisplayStr.replace(/%%H%%/g,		Calcage(secs,3600,24));
-	    DisplayStr = DisplayStr.replace(/%%M%%/g,		Calcage(secs,60,60));
-	    DisplayStr = DisplayStr.replace(/%%S%%/g,		Calcage(secs,1,60));
-	    if(secs > 0)
-	    {	
-	    	document.getElementById(myDiv).innerHTML = DisplayStr;
-	      	setTimeout("CountBack('" + myDiv + "','" + grid + "'," + (secs-1) + ");", 990);
-	    }
-	    else
-	    {
-	    	document.getElementById(myDiv).innerHTML = "Expired";
-	    	return (-1);
-	    }
-	    return (0);
+
+	function CountBack(myDiv, grid, secs) {
+		var DisplayStr;
+		var DisplayFormat = "%%D%%D %%H%%H:%%M%%M:%%S%%S";
+		if (grid == "1cx1r")
+			DisplayFormat = "%%D%%D,%%H%%:%%M%%:%%S%%";
+		DisplayStr = DisplayFormat.replace(/%%D%%/g, Calcage(secs, 86400,
+				100000));
+		DisplayStr = DisplayStr.replace(/%%H%%/g, Calcage(secs, 3600, 24));
+		DisplayStr = DisplayStr.replace(/%%M%%/g, Calcage(secs, 60, 60));
+		DisplayStr = DisplayStr.replace(/%%S%%/g, Calcage(secs, 1, 60));
+
+		if (secs > 0) {
+			document.getElementById(myDiv).innerHTML = DisplayStr;
+			setTimeout("CountBack('" + myDiv + "','" + grid + "'," + (secs - 1) + ");", 990);
+			return (secs);
+		} else {
+			// Expired
+			//document.getElementById(myDiv).innerHTML = "Expired";
+			//refresh(userId, userName);
+			initGUI();
+			return (-1);
+		}
+		return (0);
 	}
-	
 </script> 
 </head>
 
@@ -453,16 +749,21 @@ body {
 <!--Header_開始-->
 <div id="header">
 	<div id="logo">freeAD</div>
+    <div id="welcome" class="login_info"></div>
     <div id="nav_buttons">
-    	<a href="#">刊登說明</a>&nbsp;&nbsp;|&nbsp;&nbsp;
-        <a href="#">隱私權政策</a>&nbsp;&nbsp;|&nbsp;&nbsp;
-        <a href="#">如何加入 VIP</a>&nbsp;&nbsp;|&nbsp;&nbsp;
-        <a href="#">VIP 登入</a>
+    	<ul>
+            <li><a onClick="howtoOnClick()" href="#">刊登說明</a></li>
+            <li><a onClick="policyOnClick()" href="#">隱私權政策</a></li>
+            <li><a onClick="joinOnClick()" href="#">如何加入 VIP</a></li>
+            <li><a id="vipLogin" href="#">VIP 登入</a></li>
+        </ul>
     </div>
+    
 </div>
 <!--Header_結束-->
 <!--Container_開始-->
 <div id="container">
+<form id="home" name="home">
 <table class="table_free_ad">
 	<tr> <!-- r0 -->
     	<td id="r0c0" class="td_border" rowspan="2" colspan="2" valign="top"> <!-- c0 -->
@@ -577,6 +878,7 @@ body {
         </td>
     </tr>
 </table>
+</form>
 </div>
 <!--Container_結束-->
 <!--Footer_開始-->

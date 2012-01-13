@@ -32,6 +32,7 @@ if(isSet($_POST['type']))
 		else {
 			$expire_set = 'failed';
 		}
+		$return_arr = array();
 		$return_arr["setExpire"] = $expire_set;
 		$json_encoded_string = json_encode($return_arr);
 		echo $json_encoded_string;

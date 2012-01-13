@@ -32,6 +32,29 @@ table{
 <link href="../css/cms_main_structure.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript">
 	
+	function checkLogin() {
+		if (window.location.href.indexOf("?") != -1) {
+			var status = getValue("status");	
+			userName = getValue("username");
+			if (status == "loginSuccess") {
+				alert("系統管理員, 歡迎回來!");
+				refresh(userName);
+			} else if (status == "loginFailed") {
+				alert("登入失敗, 請檢查您的帳號密碼!");
+				userName = "";
+				refresh(userName);
+			}
+		}
+		else {
+			alert("登入失敗, 請檢查您的帳號密碼!");
+			window.location="login.html?username="+userName;
+		}
+	}
+	
+	function refresh(name) {
+		window.location="cms_edit.html?mode=add&username="+name;
+	}
+
 	pic1 = new Image(16, 16); 
 	pic1.src = "../pictures/loader.gif";	
 	
@@ -44,19 +67,19 @@ table{
 		$("#editExpireTime").val(time);
 	}
 
+	function setupWeb() {
+		window.location="cms_setup.html?username="+userName;
+	}
+	
 	function initAddGUI() {
-		if (mode == 'edit') {
-			mode = 'add';
-			window.location="cms_edit.html?mode=add";
-			return;
-		}
 		$('#editName').empty();
 		$('#editPhone').empty();
 		$('#editPayment').empty();
 		$('#editUserName').empty();
 		$('#editUserPass').empty();
-		$("#editUserPass").show();
-		$("#passTitle").show();
+		$("#editUserPass").empty();
+		/* $("#editUserPass").show();
+		$("#passTitle").show(); */
 		$("#selectTitle").hide();
 		$("#selectName").hide();
 		initDateTime();
@@ -64,8 +87,7 @@ table{
 
 	function initEditGUI() {
 		if (mode == 'add') {
-			mode = 'edit';
-			window.location="cms_edit.html?mode=edit";
+			window.location="cms_view.html?username="+userName;
 			return;
 		}
 	    $.ajax({
@@ -100,20 +122,23 @@ table{
 	        	$("#editPhone").val(data.phone.toString());
 	        	var initArgs = data.initTime.toString().split(" ");
 	        	$("#editInit").val(initArgs[0].toString());
-	        	$("#editInitTime").val(initArgs[1].toString());
+	        	$("#editInitTime").val(initArgs[1].toString()+" " +initArgs[2].toString());
 	        	$("#editPayment").val(data.payment.toString());
 	        	$("#editUserName").val(data.username.toString());
-	        	$("#editUserPass").hide();
-	        	$("#passTitle").hide();
+	        	$("#editUserPass").val(data.password.toString());
+	        	/* $("#editUserPass").hide();
+	        	$("#passTitle").hide(); */
 	        	var expireArgs = data.expireTime.toString().split(" ");
 	        	$("#editExpire").val(expireArgs[0].toString());
-	        	$("#editExpireTime").val(expireArgs[1].toString());
+	        	$("#editExpireTime").val(expireArgs[1].toString()+" " +expireArgs[2].toString());
 	        }
 	    });
 	}
 	
 	var mode = ''; 
+	var userName = "";
 	$(document).ready(function() {
+		checkLogin();
 		initDateTime();
 		mode = getValue("mode");
 		if (mode == "add") {
@@ -138,8 +163,8 @@ table{
 					+ "&name="+ $('#editName').val().toString() 
 					+ "&phone="+ $('#editPhone').val()
 					+ "&payment="+ $('#editPayment').val() 
-					+ "&initTime="+ ($('#editInit').val().toString() + " " + $('#editInitTime').val().toString() + " " + "+0800")
-					+ "&expireTime="+ ($('#editExpire').val().toString() + " " + $('#editExpireTime').val().toString() + " " + "+0800"),
+					+ "&initTime="+ ($('#editInit').val().toString() + " " + $('#editInitTime').val().toString())
+					+ "&expireTime="+ ($('#editExpire').val().toString() + " " + $('#editExpireTime').val().toString()),
 		        dataType: "json",
 		        success: function(data) {
 					//alert(data.registry_check);					
@@ -153,24 +178,19 @@ table{
 
 		        }
 
-		        });
+	        });
 
-		    });
-		});
+	    });
+	});
 
-		$("#selectName").change(function() {
-			var foo = [];
-			$("#selectName :selected").each(function(i, selected){
-				foo[i] = $(selected).text();
-				initEditUser(foo[i].toString());
-			});			
-			
-		});
+	$("#selectName").change(function() {
+		var foo = [];
+		$("#selectName :selected").each(function(i, selected){
+			foo[i] = $(selected).text();
+			initEditUser(foo[i].toString());
+		});			
 		
-	$('#clean').click(function() {
-	    $('#editUserName').html("");
-	    // document.getElementById('msg').innerHTML = "";
-	 });
+	});
 	
 	$("#editUserName").change(function() { 
 		
@@ -249,14 +269,22 @@ table{
 	 	
 	});  
 
+	function clean() {
+	    $('#editName').val("");
+	    $('#editPhone').val("");
+	    $('#editPayment').val("");
+	    $('#editUserName').val("");
+	    $('#editUserPass').val("");
+	}
+	
 	function getDate(type) {
 		var bar = "";
 		var now = new Date();
 		if (type == "date")
 			bar = (now.getMonth()+1) + "/" + now.getDate() + "/" + (1900 + now.getYear());
 		else if (type == "time") {
-			var str = now.getHours()>12?" PM":" AM";
-			bar = (now.getHours()>12?(now.getHours()-12):now.getHours()) + ":" + now.getMinutes() + str;
+			var str = now.getHours()>12?"PM":"AM";
+			bar = (now.getHours()>12?(now.getHours()-12):now.getHours()) + ":" + now.getMinutes() + ":" + now.getSeconds() +" "+ str;
 		}			
 		return bar;
 	}
@@ -319,7 +347,7 @@ table{
 		answer = confirm("確定要登出?")
 		if (answer !=0)
 		{
-			location = "../../index.html"
+			location = "../../admin/index.html"
 		}
 	}
 </script>
@@ -345,7 +373,7 @@ table{
 </tr>
 <tr class="tr_main_edit_area">
 	<td class="td_left_nav" valign="top">
-    	<div class="left_nav"><img src="../pictures/icon_left_nav.png" style="margin-right:3px; padding-bottom:5px;" align="absmiddle"/><a href="#">網站相關設定</a></div>
+    	<div class="left_nav"><img src="../pictures/icon_left_nav.png" style="margin-right:3px; padding-bottom:5px;" align="absmiddle"/><a onclick="setupWeb()" href="#">網站相關設定</a></div>
         <div class="left_nav"><img src="../pictures/icon_left_nav.png" style="margin-right:3px; padding-bottom:5px;" align="absmiddle"/><a href="#">VIP 會員資料管理</a></div>
         <div class="left_nav_sub_func_outter_frame">
         	<div class="left_nav_sub_func" onclick="initAddGUI()"><a href="#">新增會員資料</a></div>
@@ -389,7 +417,7 @@ table{
                 </tr>
                 <tr>
                 	<td id="passTitle" class="td_main_func_area_title" align="right">【設定】登入密碼</td>
-                    <td class="td_main_func_area_content"><input id="editUserPass" name="editUserPass" type="text" size="55px"/></td>
+                    <td class="td_main_func_area_content"><input id="editUserPass" name="editUserPass" type="password" size="55px"/></td>
                 </tr>
                 <tr>
                 	<td class="td_main_func_area_title" align="right">【設定】權限截止日期</td>
@@ -399,7 +427,7 @@ table{
                   	<td class="td_main_func_area_title" align="right">【設定】權限截止時間</td>
                   	<td class="td_main_func_area_content"><input id="editExpireTime" class="inputValue_Txt calen_sel_box" name="editExpireTime" type="text" size="55px"/></td>
                 </tr>
-                <tr><td colspan="2"><input type="submit" value="送出資料" style="margin:18px 0px 8px 170px;"/>&nbsp;&nbsp;<input type="reset" value="清除重填"/></td></tr>
+                <tr><td colspan="2"><input type="submit" value="送出資料" style="margin:18px 0px 8px 170px;"/>&nbsp;&nbsp;<input id="editClean" name="editClean" type="button" onclick="clean()" value="清除重填"/></td></tr>
             </table>
         </div>
     </td>

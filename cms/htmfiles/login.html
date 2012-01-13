@@ -23,10 +23,54 @@ table{
 </style>
 <link href="../../css/main_structure.css" rel="stylesheet" type="text/css" />
 <link href="../css/cms_main_structure.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" language="javascript" src="../../scripts/jquery-1.4.4.js"></script>
+<script type="text/javascript">
+
+$(document).ready(function() {
+	checkLogin();	
+
+});
+
+function checkLogin() {
+	if (window.location.href.indexOf("?") != -1) {
+		var status = getValue("status");
+		if (status == "loginFailed") {
+			alert("登入失敗, 請檢查您的帳號密碼!");
+			userName = "";
+			//refresh();
+		}
+	}
+}
+
+/* function refresh() {
+	window.location="./login.html;
+} */
+
+function getValue(varname) {
+	var url = window.location.href;
+	var qparts = url.split("?");
+	if (qparts.length == 0) {
+		return "";
+	}
+	var query = qparts[1];
+	var vars = query.split("&");
+	var value = "";
+	for (i = 0; i < vars.length; i++) {
+		var parts = vars[i].split("=");
+		if (parts[0] == varname) {
+			value = parts[1];
+			break;
+		}
+	}
+	value = unescape(value);
+	value.replace(/\+/g, " ");
+	return value;
+}
+</script>
 </head>
 
 <body>
-<form name="form1" method="post" action="login_check.php">
+<form name="formRootLogin" method="post" action="login_check.php">
 <table width="100%">
 <tr>
 	<td height="50px"></td>
@@ -46,7 +90,7 @@ table{
                             </tr>
                             <tr>
                             	<td align="right" valign="top" style="padding:15px 3px 3px 3px; font-size:14px;">密碼</td>
-                                <td valign="top" style="padding:11px 3px 3px 3px;"><input type="text" name="userpass" size="32"/></td>
+                                <td valign="top" style="padding:11px 3px 3px 3px;"><input type="password" name="admpass" size="32"/></td>
                             </tr>
                             <tr>
                             	<td colspan="2" valign="top" style="padding:18px 3px 3px 32px;"><input type="submit" name="Submit" value="送出資料"/>&nbsp;<input type="reset" value="清除重填"/></td>

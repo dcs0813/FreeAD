@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="keywords" content=" ">
+<meta name="description" content=" " />
+<meta name="robots" content="all">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>VIP 登入 :: freeAD</title>
+<style type="text/css">
+<!--
+body {
+	width:100%;
+	background-color:#E6E6E6;
+	margin:0px;
+}
+table.table_add_new_ad{
+	width:90%;
+	border-collapse:collapse;
+}
+td.td_main_func_area_title{
+	width:25%;
+	font-size:13px;
+	color:#333;
+	padding:6px;
+}
+td.td_main_func_area_content{
+	font-size:13px;
+	color:#333;
+	padding:6px;
+}
+-->
+</style>
+<link href="./css/main_structure.css" rel="stylesheet" type="text/css" />
+<script src="./scripts/jquery-1.4.4.js" type="text/javascript"></script>
+<script src="./scripts/colorbox/jquery.colorbox.js" type="text/javascript"></script>
+<script type="text/javascript">
+
+$(document).ready(function() {
+	var path = document.location.pathname;
+});
+</script>
+</head>
+
+<body>
+<!--<div id="wrapper">-->
+<!--Header_開始-->
+
+<!--Header_結束-->
+<!--Container_開始-->
+<div id="add_new_ad_area">
+	<form name="formVIPLogin" action="./htmfiles/login.php" method="post">
+	<table class="table_add_new_ad">
+        <tr>
+        	<td colspan="2"><div id="func_title">VIP 登入</div></td>
+        </tr>
+        <tr>
+            <td class="td_main_func_area_title" align="right">帳號</td>
+            <td class="td_main_func_area_content"><input id="loginUserName" name="loginUserName" type="text" size="45"/></td>
+        </tr>
+        <tr>
+            <td class="td_main_func_area_title" align="right">密碼</td>
+            <td class="td_main_func_area_content"><input id="loginPassword" name="loginPassword" type="password" size="45"/></td>
+        </tr>
+        <tr>
+            <td colspan="2"><input type="submit" value="送出資料" style="margin:18px 0px 8px 170px;"/>&nbsp;&nbsp;<input type="reset" value="清除重填"/></td>
+        </tr>
+    </table>
+    </form> 
+</div>
+<!--Container_結束-->
+<!--Footer_開始-->
+
+<!--Footer_結束-->
+<!--</div>-->
+</body>
+</html>
